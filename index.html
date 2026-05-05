@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoEstim — Estimateur de prix de revente</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ===================== RESET & BASE ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0f0f;
+      --surface:   #1a1a1a;
+      --surface2:  #222222;
+      --border:    #2e2e2e;
+      --red:       #e63946;
+      --red-glow:  rgba(230, 57, 70, 0.25);
+      --text:      #f0f0f0;
+      --muted:     #888;
+      --green:     #2ecc71;
+      --orange:    #f39c12;
+      --radius:    12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+
+    /* ===================== HEADER ===================== */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .car-icon svg {
+      width: 54px;
+      height: 54px;
+      filter: drop-shadow(0 0 10px var(--red));
+    }
+
+    header h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    header h1 span { color: var(--red); }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    /* ===================== CARD PRINCIPALE ===================== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 760px;
+      margin: 0 auto 32px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    /* ===================== ETAPES ===================== */
+    .step-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .step-item { display: flex; flex-direction: column; }
+
+    /* ===================== INPUTS & SELECTS ===================== */
+    select, input[type="number"] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+    }
+
+    select:focus, input[type="number"]:focus {
+      outline: none;
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-glow);
+    }
+
+    select:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    input[type="number"]::-webkit-inner-spin-button { display: none; }
+
+    /* ===================== DIVISEUR ===================== */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    /* ===================== BOUTON ESTIMER ===================== */
+    .btn-estimate {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    }
+
+    .btn-estimate:hover { background: #c62e3a; box-shadow: 0 0 20px var(--red-glow); }
+    .btn-estimate:active { transform: scale(0.98); }
+
+    /* ===================== SECTION RESULTATS ===================== */
+    #results { display: none; max-width: 760px; margin: 0 auto; }
+
+    /* Badge etat */
+    .etat-wrap { text-align: center; margin-bottom: 28px; }
+
+    .etat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 1.5px;
+      padding: 6px 20px;
+      border-radius: 50px;
+      text-transform: uppercase;
+    }
+
+    .badge-excellent { background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.35); }
+    .badge-bon       { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid rgba(52,152,219,0.35); }
+    .badge-correct   { background: rgba(243,156,18,0.15); color: #f39c12; border: 1px solid rgba(243,156,18,0.35); }
+    .badge-fatigue   { background: rgba(231,76,60,0.15);  color: #e74c3c; border: 1px solid rgba(231,76,60,0.35); }
+
+    /* Cards prix */
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .price-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .price-card:hover { transform: translateY(-3px); }
+
+    .price-card.high { border-top: 3px solid var(--green); }
+    .price-card.mid  { border-top: 3px solid var(--text);  }
+    .price-card.low  { border-top: 3px solid var(--orange); }
+
+    .price-card .card-label {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .price-card .price-val {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .price-card.high .price-val { color: var(--green); }
+    .price-card.low  .price-val { color: var(--orange); }
+
+    .price-card .price-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    /* ===================== CARTE GRAPHIQUE ===================== */
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .chart-title span { color: var(--red); }
+
+    canvas { max-height: 300px; }
+
+    /* ===================== INFO VEHICULE ===================== */
+    .vehicle-info {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 28px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .vehicle-info strong { color: var(--text); }
+
+    /* ===================== NOTE DE BAS ===================== */
+    .disclaimer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 540px) {
+      .step-grid  { grid-template-columns: 1fr; }
+      .price-grid { grid-template-columns: 1fr; }
+      .card       { padding: 20px 16px; }
+    }
+
+    /* ===================== ANIMATION COMPTEUR ===================== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    .price-card { animation: fadeUp 0.45s ease both; }
+    .price-card:nth-child(1) { animation-delay: 0.05s; }
+    .price-card:nth-child(2) { animation-delay: 0.15s; }
+    .price-card:nth-child(3) { animation-delay: 0.25s; }
+  </style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header>
+  <div class="logo-wrap">
+    <div class="car-icon">
+      <!-- Icone voiture SVG -->
+      <svg viewBox="0 0 64 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="18" width="48" height="16" rx="4" fill="#e63946"/>
+        <path d="M14 18 L20 6 H44 L50 18" fill="#c62e3a" stroke="#e63946" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="18" cy="34" r="6" fill="#1a1a1a" stroke="#e63946" stroke-width="2"/>
+        <circle cx="46" cy="34" r="6" fill="#1a1a1a" stroke="#e63946" stroke-width="2"/>
+        <circle cx="18" cy="34" r="2.5" fill="#e63946"/>
+        <circle cx="46" cy="34" r="2.5" fill="#e63946"/>
+        <rect x="22" y="9" width="10" height="8" rx="2" fill="#1a1a1a" opacity="0.6"/>
+        <rect x="34" y="9" width="10" height="8" rx="2" fill="#1a1a1a" opacity="0.6"/>
+        <rect x="4"  y="22" width="6" height="4" rx="1" fill="#f0f0f0" opacity="0.8"/>
+        <rect x="54" y="22" width="6" height="4" rx="1" fill="#f39c12" opacity="0.8"/>
+      </svg>
+    </div>
+    <h1><span>Auto</span>Estim</h1>
+  </div>
+  <p>Estimateur de prix de revente automobile &mdash; Marche francais</p>
+</header>
+
+<!-- ==================== FORMULAIRE ==================== -->
+<div class="card">
+
+  <!-- Etapes : Marque + Modele -->
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">01 &mdash; Marque</div>
+      <select id="sel-marque" onchange="onMarqueChange()">
+        <option value="">Selectionner une marque</option>
+      </select>
+    </div>
+    <div class="step-item">
+      <div class="step-label">02 &mdash; Modele</div>
+      <select id="sel-modele" onchange="onModeleChange()" disabled>
+        <option value="">Selectionner un modele</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Etapes : Annee + Kilometrage -->
+  <div class="step-grid">
+    <div class="step-item">
+      <div class="step-label">03 &mdash; Annee</div>
+      <select id="sel-annee" disabled>
+        <option value="">Selectionner une annee</option>
+      </select>
+    </div>
+    <div class="step-item">
+      <div class="step-label">04 &mdash; Kilometrage</div>
+      <input type="number" id="inp-km" placeholder="Ex : 85000" min="0" max="999999" disabled />
+    </div>
+  </div>
+
+  <hr class="divider" />
+  <button class="btn-estimate" onclick="estimer()">&#9889; Estimer le prix de revente</button>
+</div>
+
+<!-- ==================== RESULTATS ==================== -->
+<div id="results">
+
+  <!-- Info vehicule recapitulatif -->
+  <div class="vehicle-info" id="vehicle-summary"></div>
+
+  <!-- Badge etat -->
+  <div class="etat-wrap">
+    <div class="etat-label">Etat general estime</div>
+    <span class="badge" id="badge-etat"></span>
+  </div>
+
+  <!-- 3 cards de prix -->
+  <div class="price-grid">
+    <div class="price-card high">
+      <div class="card-label">Prix haut</div>
+      <div class="price-val" id="prix-haut">&mdash;</div>
+      <div class="price-sub">Excellent etat / Faible km</div>
+    </div>
+    <div class="price-card mid">
+      <div class="card-label">Prix moyen</div>
+      <div class="price-val" id="prix-moyen">&mdash;</div>
+      <div class="price-sub">Estimation marche</div>
+    </div>
+    <div class="price-card low">
+      <div class="card-label">Prix bas</div>
+      <div class="price-val" id="prix-bas">&mdash;</div>
+      <div class="price-sub">Etat moyen / Kilometrage eleve</div>
+    </div>
+  </div>
+
+  <!-- Graphique depreciation -->
+  <div class="chart-card">
+    <div class="chart-title">Courbe de depreciation &mdash; <span id="chart-title-model">modele</span></div>
+    <canvas id="chartDeprec"></canvas>
+  </div>
+
+  <div class="disclaimer">
+    Les estimations sont calculees par algorithme a titre indicatif. Elles ne remplacent pas une expertise professionnelle.
+    Les prix reels varient selon l'etat du vehicule, l'equipement et le marche local.
+  </div>
+</div>
+
+
+<script>
+/* =====================================================================
+   BASE DE DONNEES VEHICULES (JSON embarque)
+   prixNeuf        : prix catalogue neuf en euros
+   depreciationAnn : taux de depreciation annuelle (entre 0 et 1)
+   kmMoyenAnnuel   : kilometrage moyen annuel de reference
+   ===================================================================== */
+const VEHICULES = {
+  "Renault": {
+    "Clio":    { prixNeuf: 18500, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
+    "Megane":  { prixNeuf: 23000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
+    "Kadjar":  { prixNeuf: 28000, depreciationAnn: 0.14, kmMoyenAnnuel: 16000 },
+    "Captur":  { prixNeuf: 22500, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
+    "Zoe":     { prixNeuf: 32000, depreciationAnn: 0.16, kmMoyenAnnuel: 12000 }
+  },
+  "Peugeot": {
+    "208":   { prixNeuf: 20000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
+    "308":   { prixNeuf: 26000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
+    "3008":  { prixNeuf: 34000, depreciationAnn: 0.13, kmMoyenAnnuel: 16000 },
+    "5008":  { prixNeuf: 38000, depreciationAnn: 0.12, kmMoyenAnnuel: 16000 }
+  },
+  "Citroen": {
+    "C3":          { prixNeuf: 17000, depreciationAnn: 0.13, kmMoyenAnnuel: 14000 },
+    "C5 Aircross": { prixNeuf: 32000, depreciationAnn: 0.13, kmMoyenAnnuel: 16000 },
+    "C4":          { prixNeuf: 25000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 }
+  },
+  "Volkswagen": {
+    "Polo":   { prixNeuf: 22000, depreciationAnn: 0.11, kmMoyenAnnuel: 14000 },
+    "Golf":   { prixNeuf: 30000, depreciationAnn: 0.10, kmMoyenAnnuel: 15000 },
+    "Tiguan": { prixNeuf: 38000, depreciationAnn: 0.11, kmMoyenAnnuel: 16000 },
+    "T-Roc":  { prixNeuf: 32000, depreciationAnn: 0.11, kmMoyenAnnuel: 15000 }
+  },
+  "BMW": {
+    "Serie 1": { prixNeuf: 35000, depreciationAnn: 0.14, kmMoyenAnnuel: 15000 },
+    "Serie 3": { prixNeuf: 48000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
+    "Serie 5": { prixNeuf: 62000, depreciationAnn: 0.13, kmMoyenAnnuel: 16000 }
+  },
+  "Mercedes": {
+    "Classe A": { prixNeuf: 38000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
+    "Classe C": { prixNeuf: 52000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
+    "GLA":      { prixNeuf: 44000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 }
+  },
+  "Toyota": {
+    "Yaris":       { prixNeuf: 20000, depreciationAnn: 0.10, kmMoyenAnnuel: 13000 },
+    "Corolla":     { prixNeuf: 27000, depreciationAnn: 0.10, kmMoyenAnnuel: 15000 },
+    "RAV4":        { prixNeuf: 38000, depreciationAnn: 0.11, kmMoyenAnnuel: 16000 },
+    "Yaris Cross": { prixNeuf: 25000, depreciationAnn: 0.10, kmMoyenAnnuel: 14000 }
+  },
+  "Ford": {
+    "Fiesta": { prixNeuf: 19000, depreciationAnn: 0.13, kmMoyenAnnuel: 14000 },
+    "Focus":  { prixNeuf: 26000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
+    "Puma":   { prixNeuf: 27000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 }
+  },
+  "Dacia": {
+    "Sandero": { prixNeuf: 13000, depreciationAnn: 0.11, kmMoyenAnnuel: 15000 },
+    "Duster":  { prixNeuf: 18000, depreciationAnn: 0.11, kmMoyenAnnuel: 16000 },
+    "Logan":   { prixNeuf: 11500, depreciationAnn: 0.12, kmMoyenAnnuel: 14000 }
+  },
+  "Audi": {
+    "A1": { prixNeuf: 28000, depreciationAnn: 0.13, kmMoyenAnnuel: 14000 },
+    "A3": { prixNeuf: 37000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
+    "A4": { prixNeuf: 48000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
+    "Q3": { prixNeuf: 42000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 }
+  }
+};
+
+const ANNEE_COURANTE = 2024;
+const FOURCHETTE     = 0.12; // +/-12%
+
+/* =====================================================================
+   INITIALISATION DES SELECTS
+   ===================================================================== */
+(function init() {
+  /* Remplir la liste des marques par ordre alphabetique */
+  const selMarque = document.getElementById('sel-marque');
+  Object.keys(VEHICULES).sort().forEach(marque => {
+    const opt = document.createElement('option');
+    opt.value = marque;
+    opt.textContent = marque;
+    selMarque.appendChild(opt);
+  });
+
+  /* Remplir les annees de 2024 a 2000 */
+  const selAnnee = document.getElementById('sel-annee');
+  for (let a = ANNEE_COURANTE; a >= 2000; a--) {
+    const opt = document.createElement('option');
+    opt.value = a;
+    opt.textContent = a;
+    selAnnee.appendChild(opt);
+  }
+})();
+
+/* =====================================================================
+   EVENEMENT : changement de marque
+   ===================================================================== */
+function onMarqueChange() {
+  const marque   = document.getElementById('sel-marque').value;
+  const selModel = document.getElementById('sel-modele');
+  const selAnnee = document.getElementById('sel-annee');
+  const inpKm    = document.getElementById('inp-km');
+
+  /* Reinitialiser les champs suivants */
+  selModel.innerHTML = '<option value="">Selectionner un modele</option>';
+  selAnnee.value = '';
+  inpKm.value   = '';
+
+  if (!marque) {
+    selModel.disabled = true;
+    selAnnee.disabled = true;
+    inpKm.disabled    = true;
+    return;
+  }
+
+  /* Remplir les modeles de la marque selectionnee */
+  Object.keys(VEHICULES[marque]).sort().forEach(modele => {
+    const opt = document.createElement('option');
+    opt.value = modele;
+    opt.textContent = modele;
+    selModel.appendChild(opt);
+  });
+
+  selModel.disabled = false;
+  selAnnee.disabled = true;
+  inpKm.disabled    = true;
+}
+
+/* =====================================================================
+   EVENEMENT : changement de modele
+   ===================================================================== */
+function onModeleChange() {
+  const modele   = document.getElementById('sel-modele').value;
+  const selAnnee = document.getElementById('sel-annee');
+  const inpKm    = document.getElementById('inp-km');
+
+  if (!modele) {
+    selAnnee.disabled = true;
+    inpKm.disabled    = true;
+    return;
+  }
+
+  selAnnee.disabled = false;
+  inpKm.disabled    = false;
+}
+
+/* =====================================================================
+   ALGORITHME PRINCIPAL DE CALCUL DE PRIX
+   - Prix de base via depreciation exponentielle
+   - Ajustement kilometrage : -0.8% par tranche de 10 000 km au-dessus,
+     +0.5% par tranche en dessous de la moyenne
+   - Fourchette : prix moyen +/-12%
+   ===================================================================== */
+function calculerPrix(modeleData, annee, km) {
+  const age = ANNEE_COURANTE - annee;
+
+  /* Prix de base apres depreciation annuelle composee */
+  const prixBase = modeleData.prixNeuf * Math.pow(1 - modeleData.depreciationAnn, age);
+
+  /* Kilometrage attendu sur la duree de vie du vehicule */
+  const kmAttendu = modeleData.kmMoyenAnnuel * age;
+
+  /* Ecart exprime en tranches de 10 000 km */
+  const ecartTranches = (km - kmAttendu) / 10000;
+
+  /* Coefficient d'ajustement kilometrique */
+  let coefKm;
+  if (ecartTranches > 0) {
+    coefKm = 1 - 0.008 * ecartTranches;  // -0.8% par tranche au-dessus
+  } else {
+    coefKm = 1 - 0.005 * ecartTranches;  // +0.5% par tranche en dessous
+  }
+
+  /* Securite : coef entre 40% et 130% du prix de base */
+  coefKm = Math.max(0.4, Math.min(1.3, coefKm));
+
+  const prixMoyen = Math.round(prixBase * coefKm);
+
+  return {
+    moyen: prixMoyen,
+    haut:  Math.round(prixMoyen * (1 + FOURCHETTE)),
+    bas:   Math.round(prixMoyen * (1 - FOURCHETTE))
+  };
+}
+
+/* =====================================================================
+   ETAT GENERAL DU VEHICULE
+   Score combine age et kilometrage pour obtenir un label
+   ===================================================================== */
+function determinerEtat(age, km) {
+  const score = age * 1.2 + km / 20000;
+
+  if (score < 3)  return { label: 'Excellent', classe: 'badge-excellent' };
+  if (score < 7)  return { label: 'Bon',       classe: 'badge-bon'       };
+  if (score < 12) return { label: 'Correct',   classe: 'badge-correct'   };
+  return              { label: 'Fatigue',   classe: 'badge-fatigue'   };
+}
+
+/* =====================================================================
+   ANIMATION COMPTEUR (easing ease-out cubic)
+   ===================================================================== */
+function animerCompteur(element, cible, duree) {
+  duree = duree || 900;
+  const debut = Date.now();
+
+  function update() {
+    const elapsed  = Date.now() - debut;
+    const progress = Math.min(elapsed / duree, 1);
+    const eased    = 1 - Math.pow(1 - progress, 3);
+    const valeur   = Math.round(cible * eased);
+    element.textContent = formatPrix(valeur);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+}
+
+/* Formater un nombre en euros (locale francaise) */
+function formatPrix(n) {
+  return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+}
+
+/* =====================================================================
+   GRAPHIQUE DE DEPRECIATION SUR 15 ANS (Chart.js)
+   Un point marque l'annee actuelle du vehicule estime
+   ===================================================================== */
+let chartInstance = null;
+
+function tracerGraphique(modeleData, marque, modele, anneeVehicule) {
+  const labels  = [];
+  const valeurs = [];
+  const anneeMax = anneeVehicule + 15;
+
+  /* Calcul de la valeur pour chaque annee depuis l'achat neuf */
+  for (let a = anneeVehicule; a <= anneeMax; a++) {
+    const ageLoop = a - anneeVehicule;
+    const prix    = modeleData.prixNeuf * Math.pow(1 - modeleData.depreciationAnn, ageLoop);
+    labels.push(a);
+    valeurs.push(Math.round(Math.max(prix, modeleData.prixNeuf * 0.05)));
+  }
+
+  document.getElementById('chart-title-model').textContent = marque + ' ' + modele;
+
+  /* Indice correspondant a l'annee courante dans la serie */
+  const idxActuel = Math.min(ANNEE_COURANTE - anneeVehicule, labels.length - 1);
+
+  /* Detruire l'ancien graphique si existant */
+  if (chartInstance) chartInstance.destroy();
+
+  const ctx      = document.getElementById('chartDeprec').getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+  gradient.addColorStop(0, 'rgba(230, 57, 70, 0.35)');
+  gradient.addColorStop(1, 'rgba(230, 57, 70, 0.01)');
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Valeur estimee',
+        data: valeurs,
+        borderColor: '#e63946',
+        backgroundColor: gradient,
+        borderWidth: 2.5,
+        /* Le point de l'annee actuelle est mis en evidence */
+        pointRadius: labels.map(function(_, i) { return i === idxActuel ? 8 : 3; }),
+        pointBackgroundColor: labels.map(function(_, i) { return i === idxActuel ? '#fff' : '#e63946'; }),
+        pointBorderColor: '#e63946',
+        pointBorderWidth: labels.map(function(_, i) { return i === idxActuel ? 3 : 1.5; }),
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          borderColor: '#2e2e2e',
+          borderWidth: 1,
+          titleColor: '#f0f0f0',
+          bodyColor: '#aaa',
+          callbacks: {
+            label: function(ctx) { return ' ' + formatPrix(ctx.parsed.y); }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#1f1f1f' },
+          ticks: { color: '#888', font: { family: 'Inter', size: 11 } }
+        },
+        y: {
+          grid: { color: '#1f1f1f' },
+          ticks: {
+            color: '#888',
+            font: { family: 'Inter', size: 11 },
+            callback: function(v) { return formatPrix(v); }
+          },
+          beginAtZero: false
+        }
+      }
+    }
+  });
+}
+
+/* =====================================================================
+   FONCTION PRINCIPALE : ESTIMER
+   Valide les entrees, calcule les prix, affiche les resultats
+   ===================================================================== */
+function estimer() {
+  const marque = document.getElementById('sel-marque').value;
+  const modele = document.getElementById('sel-modele').value;
+  const annee  = parseInt(document.getElementById('sel-annee').value);
+  const km     = parseInt(document.getElementById('inp-km').value);
+
+  /* --- Validation des champs --- */
+  if (!marque || !modele) {
+    alert('Veuillez selectionner une marque et un modele.');
+    return;
+  }
+  if (!annee) {
+    alert('Veuillez selectionner une annee.');
+    return;
+  }
+  if (isNaN(km) || km < 0) {
+    alert('Veuillez entrer un kilometrage valide (nombre positif).');
+    return;
+  }
+
+  /* Verification que la combinaison marque/modele existe */
+  if (!VEHICULES[marque] || !VEHICULES[marque][modele]) {
+    alert('Modele introuvable dans la base de donnees. Veuillez verifier votre selection.');
+    return;
+  }
+
+  const modeleData = VEHICULES[marque][modele];
+  const age        = ANNEE_COURANTE - annee;
+
+  /* --- Calcul des fourchettes de prix --- */
+  const prix = calculerPrix(modeleData, annee, km);
+
+  /* --- Determination de l'etat general --- */
+  const etat = determinerEtat(age, km);
+
+  /* --- Affichage du badge etat --- */
+  const badgeEl    = document.getElementById('badge-etat');
+  badgeEl.textContent = etat.label;
+  badgeEl.className   = 'badge ' + etat.classe;
+
+  /* --- Recapitulatif vehicule --- */
+  document.getElementById('vehicle-summary').innerHTML =
+    '<span><strong>' + marque + ' ' + modele + '</strong></span>' +
+    '<span>Annee <strong>' + annee + '</strong></span>' +
+    '<span>Kilometrage <strong>' + km.toLocaleString('fr-FR') + ' km</strong></span>' +
+    '<span>Age <strong>' + age + ' an' + (age > 1 ? 's' : '') + '</strong></span>' +
+    '<span>Prix neuf <strong>' + formatPrix(modeleData.prixNeuf) + '</strong></span>';
+
+  /* --- Animation des compteurs de prix --- */
+  animerCompteur(document.getElementById('prix-haut'),  prix.haut,  900);
+  animerCompteur(document.getElementById('prix-moyen'), prix.moyen, 1000);
+  animerCompteur(document.getElementById('prix-bas'),   prix.bas,   1100);
+
+  /* --- Tracage du graphique de depreciation --- */
+  tracerGraphique(modeleData, marque, modele, annee);
+
+  /* --- Revelation de la section resultats avec scroll --- */
+  const section = document.getElementById('results');
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
