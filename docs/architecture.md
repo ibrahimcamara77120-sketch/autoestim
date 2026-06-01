@@ -38,8 +38,7 @@ AutoEstim est une application web **3-tiers** déployée intégralement dans le 
 │                                                          │
 │   PostgreSQL 16 — Neon Serverless (AWS us-east-1)        │
 │   Base : neondb / neon-red-village                       │
-│   6 tables : marques, modeles, utilisateurs,             │
-│              estimations, favoris, historique_prix_marche│
+│   3 tables : marques, modeles, estimations               │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -112,10 +111,7 @@ AutoEstim est une application web **3-tiers** déployée intégralement dans le 
 |-------|-----------------|------|
 | `marques` | 10 | Référentiel des marques automobiles |
 | `modeles` | 36 | Caractéristiques des modèles (prix, dépréciation, carburants) |
-| `utilisateurs` | 5 | Comptes (pour future authentification) |
 | `estimations` | 12+ | Historique de toutes les estimations effectuées |
-| `favoris` | 6 | Estimations sauvegardées par les utilisateurs |
-| `historique_prix_marche` | 15 | Prix réels observés (calibrage algorithme) |
 
 ---
 

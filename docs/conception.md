@@ -104,126 +104,82 @@ Visiteur        Frontend (JS)      API /marques    API /modeles    API /estimati
 ## 3. Diagramme de classes
 
 ```
-┌──────────────────┐           ┌────────────────────────────────────────┐
-│     Marque       │  1     N  │                Modele                  │
-├──────────────────┤──────────►├────────────────────────────────────────┤
-│ + id : int       │           │ + id : int                             │
-│ + nom : string   │           │ + nom : string                         │
-│ + pays : string  │           │ + categorie : string                   │
-│ + logo_url : str │           │ + prixNeuf : int                       │
-├──────────────────┤           │ + depreciationAnn : decimal(4,2)       │
-│ + getModeles()   │           │ + kmMoyenAnnuel : int                  │
-└──────────────────┘           │ + carburants : string (csv)            │
-                               │ + anneeDebut : int                     │
-                               ├────────────────────────────────────────┤
-                               │ + estimer(annee, km, opts) : Estimation│
-                               └───────────────────┬────────────────────┘
-                                                   │ 1
-                                                   │
-                                               N   ▼
-┌───────────────────────┐      ┌─────────────────────────────────────────┐
-│      Utilisateur      │  0,1 │               Estimation                │
-├───────────────────────┤──────┤─────────────────────────────────────────┤
-│ + id : int            │      │ + id : int                              │
-│ + email : string      │      │ + anneeVehicule : int                   │
-│ + nom : string        │      │ + kilometrage : int                     │
-│ + prenom : string     │      │ + prixBas : int                         │
-│ + motDePasse : string │      │ + prixMoyen : int                       │
-├───────────────────────┤      │ + prixHaut : int                        │
-│ + getFavoris()        │      │ + etatEstime : string                   │
-└───────────────┬───────┘      │ + createdAt : timestamp                 │
-                │ 1            └────────────────────────────────────────-┘
-                │                          ▲
-            N   ▼                          │ N
-┌──────────────────────┐     ┌────────────────────────────────────────┐
-│        Favori        │ 1   │          HistoriquePrixMarche          │
-├──────────────────────┤     ├────────────────────────────────────────┤
-│ + id : int           │     │ + id : int                             │
-│ + note : text        │     │ + anneeVehicule : int                  │
-│ + createdAt : ts     │     │ + kilometrage : int                    │
-└──────────────────────┘     │ + prixConstate : int                   │
-                             │ + source : string                      │
-                             │ + dateReleve : date                    │
-                             └────────────────────────────────────────┘
+┌──────────────────┐           ┌────────────────────────────────────┐
+│     Marque       │  1     N  │              Modele                │
+├──────────────────┤──────────►├────────────────────────────────────┤
+│ + id : int       │           │ + id : int                         │
+│ + nom : string   │           │ + nom : string                     │
+│ + pays : string  │           │ + categorie : string               │
+├──────────────────┤           │ + prixNeuf : int                   │
+│ + getModeles()   │           │ + depreciationAnn : decimal(4,2)   │
+└──────────────────┘           │ + kmMoyenAnnuel : int              │
+                               │ + carburants : string (csv)        │
+                               │ + anneeDebut : int                 │
+                               ├────────────────────────────────────┤
+                               │ + estimer(annee,km,opts):Estimation│
+                               └──────────────┬─────────────────────┘
+                                              │ 1
+                                          N   ▼
+                               ┌────────────────────────────────────┐
+                               │           Estimation               │
+                               ├────────────────────────────────────┤
+                               │ + id : int                         │
+                               │ + anneeVehicule : int              │
+                               │ + kilometrage : int                │
+                               │ + prixBas : int                    │
+                               │ + prixMoyen : int                  │
+                               │ + prixHaut : int                   │
+                               │ + etatEstime : string              │
+                               │ + createdAt : timestamp            │
+                               └────────────────────────────────────┘
 ```
-
----
 
 ## 4. MCD — Modèle Conceptuel de Données (Merise)
 
 ```
  MARQUE                    MODELE
-──────────────────    ─────────────────────────────────────────
+──────────────────    ─────────────────────────────────
  id (PK)              id (PK)
  nom                  nom
  pays                 categorie
- logo_url             prix_neuf
-                      depreciation_ann
-        1,N           km_moyen_annuel
-         ├─── CONTIENT ────────┤  1,1
+                      prix_neuf
+        1,N           depreciation_ann
+         ├─── CONTIENT ──────────┤ 1,1
+                      km_moyen_annuel
                       carburants
                       annee_debut
-                      annee_fin
-         │1,N                          1,N│
-         ├── POSSEDE ──────── HISTORIQUE_PRIX_MARCHE
-                              id (PK)
-                              annee_vehicule
-                              kilometrage
-                              prix_constate
-                              source
-                              date_releve
 
          │0,N
-         ├─── GÉNÈRE ──────────────────────────────────────────
-                                                               │
- UTILISATEUR                 ESTIMATION                        │
-──────────────        ────────────────────────────────────     │
- id (PK)              id (PK)                                  │
- email (UNIQUE)       annee_vehicule                           │
- nom                  kilometrage                              │
- prenom               prix_bas                                 │
- mot_de_passe         prix_moyen            ◄──────────────────┘
-                      prix_haut          1,N (GÉNÈRE)
-        0,1           etat_estime
-         └─── EFFECTUE
-                      │ 0,N
-                      └─── SAUVEGARDE ─── FAVORI
- UTILISATEUR                              id (PK)
-  0,1                                     note
-   └───────────────────────────────────────┘
+         └─── GÉNÈRE ──────────────────────────────────
+                                                       │
+                              ESTIMATION               │
+                         ─────────────────────────     │
+                              id (PK)              ◄───┘
+                              annee_vehicule
+                              kilometrage
+                              prix_bas
+                              prix_moyen
+                              prix_haut
+                              etat_estime
+                              created_at
 ```
-
----
 
 ## 5. MLD — Modèle Logique de Données
 
 ```
-MARQUES     (id, nom, pays, logo_url, created_at)
+MARQUES     (id, nom, pays, created_at)
 
-MODELES     (id, #id_marque → MARQUES.id, nom, categorie, 
+MODELES     (id, #id_marque → MARQUES.id, nom, categorie,
              prix_neuf, depreciation_ann, km_moyen_annuel,
-             carburants, annee_debut, annee_fin, created_at)
+             carburants, annee_debut, created_at)
 
-UTILISATEURS (id, email, nom, prenom, mot_de_passe, created_at)
-
-ESTIMATIONS  (id, #id_modele → MODELES.id, 
-              #id_utilisateur → UTILISATEURS.id [nullable],
-              annee_vehicule, kilometrage,
-              prix_bas, prix_moyen, prix_haut, etat_estime, created_at)
-
-FAVORIS     (id, #id_utilisateur → UTILISATEURS.id,
-             #id_estimation → ESTIMATIONS.id, note, created_at)
-
-HISTORIQUE_PRIX_MARCHE (id, #id_modele → MODELES.id,
-                        annee_vehicule, kilometrage,
-                        prix_constate, source, date_releve)
+ESTIMATIONS (id, #id_modele → MODELES.id,
+             annee_vehicule, kilometrage,
+             prix_bas, prix_moyen, prix_haut, etat_estime, created_at)
 ```
 
-**Clés primaires :** attributs soulignés (représentés ici par `id`)
+**Clés primaires :** `id` (SERIAL)
 **Clés étrangères :** attributs préfixés `#`
-**Contrainte d'intégrité :** `id_utilisateur` dans ESTIMATIONS est nullable (estimation anonyme)
-
----
 
 ## 6. MPD — Modèle Physique de Données (extrait SQL)
 

@@ -106,9 +106,7 @@ Vérifier que l'application AutoEstim v2.0 répond aux critères d'acceptation d
 |-----|------|-------------|---------|--------|
 | D01 | Intégrité référentielle | Supprimer une marque → ses modèles supprimés (CASCADE) | Cascade OK | ✅ |
 | D02 | Contrainte CHECK état | INSERT estimation avec etat_estime='Invalid' → rejet | Rejet BDD | ✅ |
-| D03 | Contrainte UNIQUE favoris | Doublon favori même user/estimation → rejet | Rejet BDD | ✅ |
-| D04 | Estimation anonyme | INSERT estimation sans id_utilisateur (NULL) → accepté | Accepté | ✅ |
-| D05 | Comptage données | SELECT COUNT sur chaque table | 10/36/5/12/6/15 lignes | ✅ |
+| D03 | Comptage données | SELECT COUNT sur chaque table | 10/36/0 lignes | ✅ |
 
 ---
 
@@ -133,9 +131,9 @@ Vérifier que l'application AutoEstim v2.0 répond aux critères d'acceptation d
 | Calcul et modificateurs | 13 | 13 | 100 % |
 | Affichage / animations | 6 | 6 | 100 % |
 | API REST | 9 | 9 | 100 % |
-| Base de données | 5 | 5 | 100 % |
+| Base de données | 3 | 3 | 100 % |
 | Compatibilité | 6 | 6 | 100 % |
-| **Total** | **49** | **49** | **100 %** |
+| **Total** | **47** | **47** | **100 %** |
 
 ---
 

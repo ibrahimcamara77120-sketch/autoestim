@@ -113,7 +113,7 @@ Le projet est **opérationnel, documenté et déployé**, ce qui correspond aux 
 | Lignes de code (API) | ~120 lignes |
 | Marques couvertes | 28 |
 | Modèles couverts | 200+ |
-| Tables en base de données | 6 |
+| Tables en base de données | 3 |
 | Endpoints API | 3 (5 routes) |
 | Cas de tests | 49 (100% réussis) |
 | URL publique | https://autoestim.vercel.app |
