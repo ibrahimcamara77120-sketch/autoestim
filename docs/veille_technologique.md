@@ -78,13 +78,19 @@ Identifier les technologies les mieux adaptées à la réalisation d'un estimate
 
 | Alternative | Pourquoi écarté |
 |------------|----------------|
-| MySQL (hébergement local) | Pas accessible depuis le cloud Vercel |
-| SQLite | Pas de cloud, pas adapté au serverless |
-| Firebase Firestore | NoSQL — pas de relationnel, pas de SQL |
-| Supabase | PostgreSQL aussi mais moins intégré à Vercel |
-| MongoDB Atlas | NoSQL — inadapté aux relations entre tables |
+| PHP + MySQL (hébergement mutualisé) | Architecture classique mais hébergement payant ; MySQL non accessible depuis Vercel sans tunnel ; déploiement manuel à chaque modification |
+| PHP + MySQL (WAMP/XAMPP local) | Fonctionne en local uniquement, impossible à partager en ligne avec une URL stable |
+| SQLite | Fichier local — pas de cloud, incompatible avec le modèle serverless (chaque Function est éphémère) |
+| Firebase Firestore | NoSQL — pas de modèle relationnel, pas de SQL standard, dépend de l'écosystème Google |
+| Supabase | PostgreSQL aussi, mais moins intégré nativement à Vercel |
+| MongoDB Atlas | NoSQL — inadapté aux relations entre tables (marques → modeles → estimations) |
 
-**Décision :** Neon + Vercel = stack cloud cohérente, tout gratuit, tout intégré.
+**Pourquoi pas PHP + MySQL ?** Le choix de Node.js + PostgreSQL repose sur 3 raisons concrètes :
+1. **Déploiement** : Vercel ne supporte pas PHP en natif ; utiliser PHP aurait nécessité un hébergement séparé (OVH, Infomaniak) avec configuration manuelle.
+2. **Cohérence** : Vercel Serverless + Neon forment un écosystème cloud unifié — les variables d'environnement sont configurées automatiquement, le HTTPS est inclus.
+3. **Compétences** : PostgreSQL est le même langage SQL qu'avec MySQL, les requêtes sont identiques. Node.js est aujourd'hui le standard du développement web côté serveur.
+
+**Décision :** Neon + Vercel = stack cloud cohérente, tout gratuit, tout intégré, URL publique HTTPS stable sans configuration manuelle.
 
 ### SDK choisi : @neondatabase/serverless
 L'ancienne librairie `@vercel/postgres` a été dépréciée courant 2025.
