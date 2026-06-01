@@ -1,93 +1,150 @@
 # Plan de tests — AutoEstim
 ## Estimateur de prix de revente automobile
 
-**Auteur :** Camara Ibrahim
-**Date :** 20/03/2026
-**Version testée :** 1.0
+**Auteur :** Camara Ibrahim — N° candidat 2545812845
+**Date :** Avril 2026 — Version 2.0
+**URL testée :** https://autoestim.vercel.app
 
 ---
 
 ## 1. Objectif des tests
 
-Vérifier que l'application AutoEstim répond aux critères d'acceptation définis dans le cahier des charges : exactitude des calculs, accessibilité de l'interface, robustesse face aux erreurs de saisie et compatibilité navigateurs.
+Vérifier que l'application AutoEstim v2.0 répond aux critères d'acceptation du cahier des charges :
+- Exactitude des calculs de prix avec modificateurs
+- Fonctionnement de l'API REST (3 endpoints)
+- Intégrité des données en base PostgreSQL
+- Robustesse face aux erreurs de saisie
+- Compatibilité navigateurs et responsive
 
 ---
 
 ## 2. Environnement de test
 
 | Élément | Détail |
-|---|---|
-| Navigateurs | Chrome 122, Firefox 124, Safari 17 |
+|---------|--------|
+| Navigateurs | Chrome 124, Firefox 126, Safari 17 |
 | Résolutions | 375px (mobile), 768px (tablette), 1440px (desktop) |
-| OS | macOS 14, iOS 17 |
-| Fichier testé | index.html v1.0 |
+| OS | macOS 14.5, iOS 17 |
+| Version testée | AutoEstim v2.0 — https://autoestim.vercel.app |
+| Base de données | Neon PostgreSQL — neondb (neon-red-village) |
+| Outils | Navigateur DevTools, DBeaver |
 
 ---
 
-## 3. Cas de tests fonctionnels
+## 3. Tests fonctionnels — Interface
 
-### 3.1 Sélection des données
+### 3.1 Sélection et navigation progressive
 
-| ID | Scénario | Résultat attendu | Résultat obtenu | Statut |
-|---|---|---|---|---|
-| T01 | Sélectionner "Renault" | La liste modèles se peuple (Clio, Mégane, Kadjar...) | Conforme | ✅ |
-| T02 | Sélectionner un modèle | Les champs Année et Km se déverrouillent | Conforme | ✅ |
-| T03 | Laisser la marque vide et cliquer Estimer | Message d'alerte affiché | Conforme | ✅ |
-| T04 | Saisir un kilométrage négatif | Message d'alerte "kilométrage invalide" | Conforme | ✅ |
-| T05 | Ne pas choisir d'année | Message d'alerte affiché | Conforme | ✅ |
+| ID  | Scénario | Résultat attendu | Résultat obtenu | Statut |
+|-----|---------|-----------------|-----------------|--------|
+| T01 | Sélectionner "Renault" | Section motorisation s'affiche, chips carburant peuplés | Conforme | ✅ |
+| T02 | Sélectionner "Clio" | Chips : Essence, Hybride, GPL | Conforme | ✅ |
+| T03 | Sélectionner "Tesla Model Y" | Chips : Électrique uniquement | Conforme | ✅ |
+| T04 | Sélectionner carburant + boîte | Section année/km apparaît | Conforme | ✅ |
+| T05 | Laisser carburant vide et cliquer Estimer | Alerte "Veuillez sélectionner un carburant" | Conforme | ✅ |
+| T06 | Laisser boîte vide | Alerte "Veuillez sélectionner la boîte" | Conforme | ✅ |
+| T07 | Kilométrage négatif | Alerte "kilométrage invalide" | Conforme | ✅ |
+| T08 | Pas d'année sélectionnée | Alerte affichée | Conforme | ✅ |
+| T09 | Ouvrir "Critères avancés" | Section couleur/options/historique visible | Conforme | ✅ |
+| T10 | Sélectionner une couleur | Swatch actif, compteur "1 actif" dans badge | Conforme | ✅ |
 
-### 3.2 Calcul du prix
+### 3.2 Calcul du prix — cas nominaux
 
-| ID | Scénario | Résultat attendu | Résultat obtenu | Statut |
-|---|---|---|---|---|
-| T06 | Renault Clio, 2020, 50 000 km | Prix moyen ~8 000–10 000 € | 9 200 € | ✅ |
-| T07 | BMW Série 3, 2015, 120 000 km | Prix moyen ~12 000–16 000 € | 13 800 € | ✅ |
-| T08 | Toyota Yaris, 2022, 10 000 km (très faible km) | Prix haut > prix moyen standard | Conforme | ✅ |
-| T09 | Dacia Sandero, 2005, 250 000 km (très élevé) | Prix bas plancher à 5% du neuf | Conforme | ✅ |
-| T10 | Véhicule neuf (2024, 0 km) | Prix proche du prix neuf | Conforme | ✅ |
+| ID  | Scénario | Résultat attendu | Résultat obtenu | Statut |
+|-----|---------|-----------------|-----------------|--------|
+| T11 | Renault Clio, Essence, Auto, 2021, 30 000 km | Prix moyen ~10 000–12 000 € | 11 200 € | ✅ |
+| T12 | BMW Série 3, Diesel, Auto, 2018, 90 000 km | Prix moyen ~15 000–20 000 € | 17 400 € | ✅ |
+| T13 | Toyota Yaris, Hybride, Manuelle, 2022, 15 000 km | Prix moyen ~17 000–20 000 € | 18 300 € | ✅ |
+| T14 | Dacia Sandero, GPL, Manuelle, 2015, 150 000 km | Prix plancher (40% du neuf min) | Conforme | ✅ |
+| T15 | Tesla Model Y, Électrique, Auto, 2022, 40 000 km | Dépréciation +18%, prix inférieur au marché classique | Conforme | ✅ |
+| T16 | Porsche 911, Essence, Manuelle, 2015, 60 000 km | Faible dépréciation (10%/an) | Conforme | ✅ |
 
-### 3.3 Affichage et interface
+### 3.3 Modificateurs — impact sur le prix
 
-| ID | Scénario | Résultat attendu | Résultat obtenu | Statut |
-|---|---|---|---|---|
-| T11 | Animation compteur prix | Les chiffres s'animent de 0 vers la valeur cible | Conforme | ✅ |
-| T12 | Badge état "Excellent" | Badge vert affiché pour véhicule récent / faible km | Conforme | ✅ |
-| T13 | Badge état "Fatigué" | Badge rouge pour véhicule ancien / fort km | Conforme | ✅ |
-| T14 | Graphique Chart.js affiché | Courbe visible, point année mis en évidence | Conforme | ✅ |
-| T15 | Info-bulle graphique au survol | Prix affiché au survol de chaque point | Conforme | ✅ |
+| ID  | Scénario | Résultat attendu | Résultat obtenu | Statut |
+|-----|---------|-----------------|-----------------|--------|
+| T17 | Diesel vs Essence (même véhicule) | Diesel: −6% | Conforme (-6%) | ✅ |
+| T18 | Boîte Auto vs Manuelle | Auto: +5% | Conforme (+5%) | ✅ |
+| T19 | Couleur Noir vs Couleur Violet | Noir: +2%, Violet: −11% | Conforme | ✅ |
+| T20 | Cuir + GPS + Toit activés | +800 + 400 + 700 = +1 900 € dans breakdown | Conforme | ✅ |
+| T21 | Première main + Carnet + Garantie | × 1.06 × 1.03 × 1.04 = +13.5% approx | Conforme | ✅ |
+| T22 | Accident grave sélectionné | −20% sur le prix final | Conforme | ✅ |
+| T23 | Breakdown affiché correctement | Chaque ligne montre un facteur avec son impact € | Conforme | ✅ |
 
-### 3.4 Compatibilité et responsive
+### 3.4 Affichage et animations
 
-| ID | Scénario | Résultat attendu | Résultat obtenu | Statut |
-|---|---|---|---|---|
-| T16 | Affichage 375px (mobile) | Grille en colonne unique, lisible | Conforme | ✅ |
-| T17 | Chrome 122 | Fonctionnement complet | Conforme | ✅ |
-| T18 | Firefox 124 | Fonctionnement complet | Conforme | ✅ |
-| T19 | Safari 17 | Fonctionnement complet | Conforme | ✅ |
+| ID  | Scénario | Résultat attendu | Résultat obtenu | Statut |
+|-----|---------|-----------------|-----------------|--------|
+| T24 | Animation compteur prix | Chiffres animent de 0 → valeur cible (900ms) | Conforme | ✅ |
+| T25 | Badge état "Excellent" | Badge vert (vehicle récent/faible km) | Conforme | ✅ |
+| T26 | Badge état "Fatigué" | Badge rouge (ancien + fort km) | Conforme | ✅ |
+| T27 | Graphique Chart.js | Courbe visible, point blanc sur année sélectionnée | Conforme | ✅ |
+| T28 | Tooltip graphique au survol | Prix formaté en € affiché | Conforme | ✅ |
+| T29 | Récapitulatif véhicule | Affiche marque, modèle, carburant, boîte, année, km, options | Conforme | ✅ |
 
 ---
 
-## 4. Tests de non-régression
+## 4. Tests API REST
 
-Après chaque modification du fichier `index.html`, les cas T01 à T10 sont rejoués manuellement pour vérifier qu'aucune régression n'est introduite.
+| ID  | Endpoint | Méthode | Test | Résultat attendu | Statut |
+|-----|----------|---------|------|-----------------|--------|
+| A01 | /api/marques | GET | Requête normale | JSON tableau 10 marques triées | ✅ |
+| A02 | /api/modeles | GET | ?marque_id=1 | JSON modèles Renault avec champ carburants | ✅ |
+| A03 | /api/modeles | GET | ?marque_id=999 | Tableau vide [] | ✅ |
+| A04 | /api/modeles | GET | sans marque_id | HTTP 400 + message erreur | ✅ |
+| A05 | /api/estimations | POST | Données valides | HTTP 201 + {success: true} | ✅ |
+| A06 | /api/estimations | POST | Données incomplètes | HTTP 400 + message erreur | ✅ |
+| A07 | /api/estimations | POST | etat_estime invalide | HTTP 400 validation échouée | ✅ |
+| A08 | /api/estimations | GET | Liste estimations | JSON 50 dernières estimations | ✅ |
+| A09 | /api/marques | DELETE | Méthode non autorisée | HTTP 405 | ✅ |
 
 ---
 
-## 5. Bilan des tests
+## 5. Tests base de données
+
+| ID  | Test | Vérification | Résultat | Statut |
+|-----|------|-------------|---------|--------|
+| D01 | Intégrité référentielle | Supprimer une marque → ses modèles supprimés (CASCADE) | Cascade OK | ✅ |
+| D02 | Contrainte CHECK état | INSERT estimation avec etat_estime='Invalid' → rejet | Rejet BDD | ✅ |
+| D03 | Contrainte UNIQUE favoris | Doublon favori même user/estimation → rejet | Rejet BDD | ✅ |
+| D04 | Estimation anonyme | INSERT estimation sans id_utilisateur (NULL) → accepté | Accepté | ✅ |
+| D05 | Comptage données | SELECT COUNT sur chaque table | 10/36/5/12/6/15 lignes | ✅ |
+
+---
+
+## 6. Tests de compatibilité et responsive
+
+| ID  | Scénario | Résultat attendu | Statut |
+|-----|---------|-----------------|--------|
+| C01 | Chrome 124 | Fonctionnement complet | ✅ |
+| C02 | Firefox 126 | Fonctionnement complet | ✅ |
+| C03 | Safari 17 | Fonctionnement complet | ✅ |
+| C04 | Mobile 375px | Grille colonne unique, chips et couleurs lisibles | ✅ |
+| C05 | Tablette 768px | Mise en page adaptée | ✅ |
+| C06 | Mode dégradé (API off) | FALLBACK local — les 28 marques restent disponibles | ✅ |
+
+---
+
+## 7. Bilan des tests
 
 | Catégorie | Tests prévus | Tests réussis | Taux |
-|---|---|---|---|
-| Sélection données | 5 | 5 | 100 % |
-| Calcul du prix | 5 | 5 | 100 % |
-| Affichage / interface | 5 | 5 | 100 % |
-| Compatibilité | 4 | 4 | 100 % |
-| **Total** | **19** | **19** | **100 %** |
+|-----------|-------------|--------------|------|
+| Interface / navigation | 10 | 10 | 100 % |
+| Calcul et modificateurs | 13 | 13 | 100 % |
+| Affichage / animations | 6 | 6 | 100 % |
+| API REST | 9 | 9 | 100 % |
+| Base de données | 5 | 5 | 100 % |
+| Compatibilité | 6 | 6 | 100 % |
+| **Total** | **49** | **49** | **100 %** |
 
 ---
 
-## 6. Anomalies détectées et corrections
+## 8. Anomalies détectées et corrections
 
 | ID | Anomalie | Correction apportée |
-|---|---|---|
-| BUG-01 | Le coef kilométrique pouvait descendre sous 0 pour des km très élevés | Ajout d'un plancher à 40% (coefKm = Math.max(0.4, ...)) |
-| BUG-02 | Le graphique n'était pas détruit avant d'être recréé | Appel à chartInstance.destroy() avant nouveau tracé |
+|----|---------|---------------------|
+| BUG-01 | Coefficient kilométrique < 0 pour km très élevé | `coefKm = Math.max(0.40, ...)` — plancher 40% |
+| BUG-02 | Graphique non détruit avant recréation | `chartInstance.destroy()` avant `new Chart()` |
+| BUG-03 | `@vercel/postgres` déprécié | Migration vers `@neondatabase/serverless` |
+| BUG-04 | `channel_binding=require` incompatible Node.js local | Utilisation de `DATABASE_URL_UNPOOLED` pour `init-db.js` |
+| BUG-05 | Marques FALLBACK absentes du select en mode API | Ajout des marques FALLBACK non présentes en DB avec indicateur `★` |

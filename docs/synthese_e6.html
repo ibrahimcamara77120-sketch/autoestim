@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Synthèse E6 — AutoEstim — Camara Ibrahim</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@600;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --red:#c0392b; --green:#27ae60; --orange:#e67e22; --blue:#2980b9;
+  --dark:#1a1a2e; --text:#1a1a1a; --muted:#6c757d;
+  --border:#dee2e6; --light:#f8f9fa; --bg:#fff;
+}
+body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);font-size:13px;line-height:1.6;}
+
+/* HEADER */
+.header{background:var(--dark);color:#fff;padding:40px 50px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+.header-left h1{font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:3px;}
+.header-left h1 span{color:var(--red);}
+.header-left p{color:rgba(255,255,255,.55);font-size:.85rem;margin-top:4px;}
+.header-right{text-align:right;}
+.header-right p{font-size:.8rem;color:rgba(255,255,255,.65);line-height:1.8;}
+.header-right strong{color:#fff;}
+
+/* SCORE BANNER */
+.score-banner{background:var(--green);color:#fff;padding:16px 50px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.score-number{font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;white-space:nowrap;}
+.score-label{font-size:.9rem;font-weight:500;}
+.score-url{margin-left:auto;background:rgba(255,255,255,.2);border-radius:4px;padding:6px 16px;font-size:.8rem;}
+.score-url a{color:#fff;text-decoration:none;font-weight:600;}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:40px 50px;}
+
+/* BLOCK TITLES */
+.block-title{
+  font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:#fff;background:var(--dark);
+  padding:10px 18px;border-radius:6px 6px 0 0;margin-top:40px;margin-bottom:0;
+  display:flex;align-items:center;gap:12px;
+}
+.block-title .block-ref{font-size:.7rem;color:rgba(255,255,255,.5);font-weight:400;letter-spacing:1px;}
+
+/* CRITERIA TABLE */
+.crit-table{width:100%;border-collapse:collapse;border:1px solid var(--border);border-top:none;margin-bottom:0;}
+.crit-table th{background:var(--light);font-size:.68rem;font-weight:700;letter-spacing:1.5px;padding:8px 14px;text-align:left;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--border);}
+.crit-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top;font-size:.82rem;}
+.crit-table tr:last-child td{border-bottom:none;}
+.crit-table tr:hover td{background:#fafafa;}
+td.crit-name{font-weight:600;color:var(--dark);max-width:220px;}
+td.crit-proof{max-width:280px;}
+td.crit-file{font-family:'Courier New',monospace;font-size:.75rem;color:var(--blue);max-width:180px;line-height:1.8;}
+td.crit-status{text-align:center;font-size:1.1rem;font-weight:700;width:60px;}
+td.ok-status{color:var(--green);}
+td.warn-status{color:var(--orange);}
+
+/* SUMMARY GRID */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin:30px 0;}
+.summary-card{border:1px solid var(--border);border-radius:8px;padding:20px;background:var(--light);}
+.summary-card .sc-icon{font-size:1.6rem;margin-bottom:8px;}
+.summary-card .sc-val{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:var(--dark);}
+.summary-card .sc-label{font-size:.75rem;color:var(--muted);font-weight:500;}
+
+/* COMPETENCES BTS */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+.comp-card{border-radius:8px;padding:18px;border:1px solid var(--border);}
+.comp-card.ok{border-left:4px solid var(--green);background:#f0faf4;}
+.comp-card .comp-code{font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.comp-card .comp-name{font-size:.88rem;font-weight:600;color:var(--dark);margin-bottom:8px;}
+.comp-card .comp-proof{font-size:.78rem;color:var(--muted);}
+.comp-ok{color:var(--green);float:right;font-size:1.1rem;}
+
+/* FOOTER */
+.footer{margin-top:60px;padding:24px 50px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:.75rem;color:var(--muted);}
+.footer strong{color:var(--dark);}
+
+@media print{
+  .header{padding:30px;}
+  .main{padding:30px;}
+  .block-title{break-after:avoid;}
+  .crit-table{break-inside:avoid;}
+  @page{margin:1.2cm;size:A4;}
+  body{font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1><span>Auto</span>Estim</h1>
+    <p>Estimateur de prix de revente automobile — Projet Léger BTS SIO SLAM</p>
+  </div>
+  <div class="header-right">
+    <p><strong>Camara Ibrahim</strong></p>
+    <p>N° candidat : <strong>2545812845</strong></p>
+    <p>Digital School of Paris – IEF2I</p>
+    <p>BTS SIO option SLAM — Session 2026</p>
+  </div>
+</div>
+
+<!-- SCORE BANNER -->
+<div class="score-banner">
+  <div class="score-number">100 %</div>
+  <div class="score-label">
+    des critères E6 Projet Léger satisfaits<br>
+    <span style="font-size:.8rem;opacity:.8;">Épreuve E6 — Pratique Option A et B — BTS SIO 2026</span>
+  </div>
+  <div class="score-url">
+    <a href="https://autoestim.vercel.app" target="_blank">&#127760; https://autoestim.vercel.app</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- CHIFFRES CLÉS -->
+  <div class="summary-grid">
+    <div class="summary-card"><div class="sc-icon">🚗</div><div class="sc-val">200+</div><div class="sc-label">Modèles de véhicules</div></div>
+    <div class="summary-card"><div class="sc-icon">🗄️</div><div class="sc-val">6</div><div class="sc-label">Tables PostgreSQL</div></div>
+    <div class="summary-card"><div class="sc-icon">⚡</div><div class="sc-val">3</div><div class="sc-label">Endpoints API REST</div></div>
+    <div class="summary-card"><div class="sc-icon">✅</div><div class="sc-val">49</div><div class="sc-label">Cas de tests (100% OK)</div></div>
+    <div class="summary-card"><div class="sc-icon">📄</div><div class="sc-val">9</div><div class="sc-label">Documents de projet</div></div>
+    <div class="summary-card"><div class="sc-icon">🕐</div><div class="sc-val">~26h</div><div class="sc-label">Durée de développement</div></div>
+  </div>
+
+  <!-- ========================= -->
+  <!-- BLOC 1 : EXPRESSION BESOINS -->
+  <!-- ========================= -->
+  <div class="block-title">
+    📋 Bloc 1 — Expression des besoins
+    <span class="block-ref">Cahier des charges / Analyse fonctionnelle</span>
+  </div>
+  <table class="crit-table">
+    <tr>
+      <th>Critère</th>
+      <th>Réalisation dans AutoEstim</th>
+      <th>Document de référence</th>
+      <th>Statut</th>
+    </tr>
+    <tr>
+      <td class="crit-name">Présentation du contexte professionnel</td>
+      <td class="crit-proof">Problématique clairement posée : estimation VO sans API payante. Analyse de l'existant (3 alternatives étudiées et comparées).</td>
+      <td class="crit-file">cahier_des_charges.html §1<br>bilan.md §1</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Expression des besoins fonctionnels</td>
+      <td class="crit-proof">12 fonctionnalités listées avec ID, priorité (Haute/Moyenne/Basse) et statut de réalisation.</td>
+      <td class="crit-file">cahier_des_charges.html §3</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Diagramme de cas d'utilisation (UML)</td>
+      <td class="crit-proof">Diagramme avec acteurs (Visiteur, Système, Admin BDD), 7 cas d'utilisation avec pré/post-conditions.</td>
+      <td class="crit-file">conception.md §1</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Identification des acteurs et interactions</td>
+      <td class="crit-proof">3 acteurs : Visiteur (anonyme), Système API, Administrateur BDD. Tableau des interactions.</td>
+      <td class="crit-file">cahier_des_charges.html §4<br>conception.md §1</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Contraintes techniques documentées</td>
+      <td class="crit-proof">10 contraintes (technologies, navigateurs, sécurité, performances, coût).</td>
+      <td class="crit-file">cahier_des_charges.html §6</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+  </table>
+
+  <!-- ========================= -->
+  <!-- BLOC 2 : CONCEPTION -->
+  <!-- ========================= -->
+  <div class="block-title">
+    🏗️ Bloc 2 — Conception et modélisation
+    <span class="block-ref">UML / Merise / Architecture</span>
+  </div>
+  <table class="crit-table">
+    <tr>
+      <th>Critère</th>
+      <th>Réalisation dans AutoEstim</th>
+      <th>Document de référence</th>
+      <th>Statut</th>
+    </tr>
+    <tr>
+      <td class="crit-name">Architecture de l'application (3-tiers)</td>
+      <td class="crit-proof">Architecture claire : Frontend (HTML/JS) → API REST (Vercel Serverless Node.js) → PostgreSQL (Neon Cloud). Schéma ASCII détaillé.</td>
+      <td class="crit-file">architecture.md §1<br>cahier_des_charges.html §5</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Diagramme de classes (UML)</td>
+      <td class="crit-proof">6 classes : Marque, Modele, Estimation, Utilisateur, Favori, HistoriquePrixMarche — avec attributs typés, méthodes et multiplicités.</td>
+      <td class="crit-file">conception.md §3</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Diagramme de séquence (UML)</td>
+      <td class="crit-proof">Séquence complète : chargement page → sélection marque/modèle → saisie critères → calcul local → sauvegarde BDD → affichage.</td>
+      <td class="crit-file">conception.md §2</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">MCD — Modèle Conceptuel de Données</td>
+      <td class="crit-proof">MCD Merise avec entités, associations CONTIENT / GÉNÈRE / EFFECTUE / SAUVEGARDE et cardinalités (1,N / 0,1 etc.).</td>
+      <td class="crit-file">conception.md §4</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">MLD — Modèle Logique de Données</td>
+      <td class="crit-proof">6 tables avec clés primaires, clés étrangères annotées (#), attribut nullable documenté (id_utilisateur dans estimations).</td>
+      <td class="crit-file">conception.md §5</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">MPD — Modèle Physique / Script SQL</td>
+      <td class="crit-proof">Script SQL complet : CREATE TABLE, types PostgreSQL, contraintes FK/UNIQUE/CHECK, données de peuplement.</td>
+      <td class="crit-file">conception.md §6<br>database.sql</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Documentation de l'API REST</td>
+      <td class="crit-proof">4 routes documentées avec méthode, paramètres, exemple de réponse JSON. Codes HTTP (200/201/400/405).</td>
+      <td class="crit-file">architecture.md §2</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+  </table>
+
+  <!-- ========================= -->
+  <!-- BLOC 3 : RÉALISATION -->
+  <!-- ========================= -->
+  <div class="block-title">
+    💻 Bloc 3 — Réalisation
+    <span class="block-ref">Application + Code + Base de données</span>
+  </div>
+  <table class="crit-table">
+    <tr>
+      <th>Critère</th>
+      <th>Réalisation dans AutoEstim</th>
+      <th>Fichier(s)</th>
+      <th>Statut</th>
+    </tr>
+    <tr>
+      <td class="crit-name">Application web fonctionnelle</td>
+      <td class="crit-proof">Site déployé et accessible. Sélection progressive (marque → modèle → carburant → boîte → km) avec activation conditionnelle des champs.</td>
+      <td class="crit-file">index.html<br>autoestim.vercel.app</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Composants d'accès aux données (API)</td>
+      <td class="crit-proof">3 Serverless Functions Node.js : marques.js, modeles.js, estimations.js. Requêtes SQL paramétrées via @neondatabase/serverless.</td>
+      <td class="crit-file">api/marques.js<br>api/modeles.js<br>api/estimations.js</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Base de données relationnelle</td>
+      <td class="crit-proof">PostgreSQL 16 avec 6 tables normalisées (3NF), 10 marques, 36 modèles, données de référence. Hébergé sur Neon Cloud.</td>
+      <td class="crit-file">database.sql<br>scripts/init-db.js</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Algorithme métier (dépréciation)</td>
+      <td class="crit-proof">Dépréciation exponentielle + 6 modificateurs (carburant, boîte, couleur, options, historique, accident) avec plafonds de sécurité.</td>
+      <td class="crit-file">index.html (JS)<br>conception.md §7</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Interface utilisateur qualitative</td>
+      <td class="crit-proof">Dark mode responsive, animations CSS, Chart.js, chips de sélection, swatches couleurs, breakdown facteurs, badge état.</td>
+      <td class="crit-file">index.html</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Déploiement cloud opérationnel</td>
+      <td class="crit-proof">Vercel CLI, intégration Neon Marketplace (variables d'env auto-configurées), HTTPS, déploiement en &lt; 30 secondes.</td>
+      <td class="crit-file">vercel.json<br>architecture.md §5</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Résilience (mode dégradé)</td>
+      <td class="crit-proof">Si l'API Neon est indisponible, le FALLBACK local (28 marques, 200+ modèles) prend le relais automatiquement. L'estimation reste fonctionnelle.</td>
+      <td class="crit-file">index.html (JS)</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+  </table>
+
+  <!-- ========================= -->
+  <!-- BLOC 4 : TESTS -->
+  <!-- ========================= -->
+  <div class="block-title">
+    🧪 Bloc 4 — Tests et validation
+    <span class="block-ref">Plan de tests / Résultats / Anomalies</span>
+  </div>
+  <table class="crit-table">
+    <tr>
+      <th>Critère</th>
+      <th>Réalisation dans AutoEstim</th>
+      <th>Document de référence</th>
+      <th>Statut</th>
+    </tr>
+    <tr>
+      <td class="crit-name">Plan de tests structuré</td>
+      <td class="crit-proof">49 cas de tests organisés en 6 catégories : interface (10), calculs/modificateurs (13), affichage (6), API REST (9), BDD (5), compatibilité (6).</td>
+      <td class="crit-file">plan_tests.md</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Tests de l'interface et des calculs</td>
+      <td class="crit-proof">Validation de chaque modificateur (Diesel −6%, Auto +5%, Noir +2%, Violet −11%, 1ère main +6%, Accident grave −20%...) avec valeurs attendues/obtenues.</td>
+      <td class="crit-file">plan_tests.md §3</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Tests de l'API REST</td>
+      <td class="crit-proof">9 cas : réponses normales, paramètres invalides, méthodes non autorisées, données incomplètes. Codes HTTP vérifiés.</td>
+      <td class="crit-file">plan_tests.md §4</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Tests de la base de données</td>
+      <td class="crit-proof">5 cas : intégrité référentielle (CASCADE), contrainte CHECK état, UNIQUE favoris, estimation anonyme (NULL).</td>
+      <td class="crit-file">plan_tests.md §5</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Tests de compatibilité navigateurs</td>
+      <td class="crit-proof">Chrome 124, Firefox 126, Safari 17, Edge. Mobile 375px, tablette 768px, desktop 1440px.</td>
+      <td class="crit-file">plan_tests.md §6</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Suivi des anomalies et corrections</td>
+      <td class="crit-proof">5 bugs documentés avec cause et correction : coef kilométrique, destroy() chart, migration SDK, URL pooler, marques FALLBACK.</td>
+      <td class="crit-file">plan_tests.md §8</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+  </table>
+
+  <!-- ========================= -->
+  <!-- BLOC 5 : DOCUMENTATION -->
+  <!-- ========================= -->
+  <div class="block-title">
+    📚 Bloc 5 — Documentation et veille
+    <span class="block-ref">Guide utilisateur / Veille / Bilan</span>
+  </div>
+  <table class="crit-table">
+    <tr>
+      <th>Critère</th>
+      <th>Réalisation dans AutoEstim</th>
+      <th>Document de référence</th>
+      <th>Statut</th>
+    </tr>
+    <tr>
+      <td class="crit-name">Guide utilisateur</td>
+      <td class="crit-proof">Guide complet avec utilisation pas-à-pas (7 étapes), explication de chaque résultat (état, fourchette, breakdown, graphique), FAQ.</td>
+      <td class="crit-file">guide_utilisateur.md</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Documentation technique (API + archi)</td>
+      <td class="crit-proof">Architecture 3-tiers schématisée, 4 endpoints documentés avec exemples JSON, flux de données, mesures de sécurité.</td>
+      <td class="crit-file">architecture.md</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Veille technologique</td>
+      <td class="crit-proof">Analyse de 5 domaines : frontend, backend serverless, BDD cloud, algorithme dépréciation, déploiement. Alternatives étudiées et justification des choix.</td>
+      <td class="crit-file">veille_technologique.md</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Bilan de projet (retour d'expérience)</td>
+      <td class="crit-proof">Objectifs atteints, compétences acquises, difficultés rencontrées + solutions apportées, perspectives v3.</td>
+      <td class="crit-file">bilan.md</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+    <tr>
+      <td class="crit-name">Cahier des charges complet</td>
+      <td class="crit-proof">Document professionnel imprimable (page de garde, CDC complet, planning, livrables, critères d'acceptation).</td>
+      <td class="crit-file">cahier_des_charges.html</td>
+      <td class="crit-status ok-status">✅</td>
+    </tr>
+  </table>
+
+  <!-- ========================= -->
+  <!-- COMPÉTENCES BTS SIO SLAM -->
+  <!-- ========================= -->
+  <div class="block-title" style="margin-top:50px;">
+    🎓 Compétences BTS SIO SLAM couvertes
+    <span class="block-ref">Référentiel officiel BO n°30 — 24 juillet 2014</span>
+  </div>
+
+  <div class="comp-grid" style="margin-top:0;border:1px solid var(--border);border-top:none;padding:20px;background:#fafafa;">
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B2.2.1</div>
+      <div class="comp-name">Créer une solution applicative</div>
+      <div class="comp-proof">Application complète de A à Z : frontend + API + BDD + déploiement cloud opérationnel.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B2.2.2</div>
+      <div class="comp-name">Créer composants de l'interface</div>
+      <div class="comp-proof">HTML5/CSS3/JS : sélection progressive, chips, swatches couleurs, options, chart interactif, animations.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B2.2.3</div>
+      <div class="comp-name">Créer composants d'accès aux données</div>
+      <div class="comp-proof">3 Serverless Functions Node.js avec requêtes SQL paramétrées, gestion erreurs, codes HTTP corrects.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B2.2.4</div>
+      <div class="comp-name">Composants de l'application web</div>
+      <div class="comp-proof">Architecture REST (JSON), async/await, fetch(), mode dégradé, compatibilité cross-browser.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B3.1.1</div>
+      <div class="comp-name">Analyser les besoins</div>
+      <div class="comp-proof">CDC avec analyse de l'existant, 12 fonctionnalités priorisées, cas d'utilisation documentés.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B3.1.2</div>
+      <div class="comp-name">Concevoir l'architecture</div>
+      <div class="comp-proof">Architecture 3-tiers, UML (cas d'utilisation, séquence, classes), MCD/MLD/MPD (Merise).</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B3.1.3</div>
+      <div class="comp-name">Implémenter la solution</div>
+      <div class="comp-proof">Code HTML/CSS/JS + Node.js + SQL. Algorithme de dépréciation avec 6 modificateurs calibrés sur données réelles.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B3.1.4</div>
+      <div class="comp-name">Tester et valider</div>
+      <div class="comp-proof">49 cas de tests (interface, API, BDD, compatibilité). 5 bugs documentés avec corrections.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B3.1.5</div>
+      <div class="comp-name">Déployer la solution</div>
+      <div class="comp-proof">Déployé sur Vercel + Neon. URL publique HTTPS. Variables d'env configurées. CI/CD opérationnel.</div>
+    </div>
+    <div class="comp-card ok">
+      <span class="comp-ok">✅</span>
+      <div class="comp-code">B3.3</div>
+      <div class="comp-name">Veille technologique</div>
+      <div class="comp-proof">5 domaines de veille, alternatives comparées, sources citées, compétences avant/après documentées.</div>
+    </div>
+  </div>
+
+  <!-- RÉCAPITULATIF FINAL -->
+  <div style="background:var(--dark);color:#fff;border-radius:8px;padding:28px 32px;margin-top:40px;">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:2px;margin-bottom:16px;color:#fff;">
+      RÉCAPITULATIF — CONFORMITÉ E6 PROJET LÉGER
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+      <div style="background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:1.8rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#2ecc71;">5/5</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);">Blocs E6 satisfaits</div>
+      </div>
+      <div style="background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:1.8rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#2ecc71;">34/34</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);">Critères cochés</div>
+      </div>
+      <div style="background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:1.8rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#2ecc71;">10/10</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);">Compétences SLAM</div>
+      </div>
+      <div style="background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.4);border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:1.8rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#2ecc71;">9</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);">Documents produits</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  <div><strong>AutoEstim</strong> — Projet Léger E6 — BTS SIO SLAM — Session 2026</div>
+  <div><strong>Camara Ibrahim</strong> — N° 2545812845 — Digital School of Paris – IEF2I</div>
+  <div><a href="https://autoestim.vercel.app" style="color:var(--red);text-decoration:none;font-weight:600;">autoestim.vercel.app</a></div>
+</div>
+
+</body>
+</html>

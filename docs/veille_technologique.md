@@ -1,107 +1,161 @@
 # Veille technologique — AutoEstim
 ## Choix des outils et technologies
 
-**Auteur :** Camara Ibrahim
-**Date :** Mars 2026
-**Projet :** AutoEstim — Estimateur de prix de revente automobile
+**Auteur :** Camara Ibrahim — N° candidat 2545812845
+**Date :** Avril 2026
+**Projet :** AutoEstim v2.0 — Architecture full-stack cloud
 
 ---
 
 ## 1. Objectif de la veille
 
-Dans le cadre du projet AutoEstim, j'ai mené une veille technologique pour identifier les outils les mieux adaptés à la réalisation d'un estimateur de prix automobile côté client (sans serveur), en tenant compte des contraintes du contexte BTS (pas d'API payante, déploiement simple, code maîtrisable).
+Identifier les technologies les mieux adaptées à la réalisation d'un estimateur de prix automobile **full-stack** (frontend + API REST + base de données + déploiement cloud), en tenant compte des contraintes du BTS SIO (maîtrise des technologies, coût nul, déploiement stable).
 
 ---
 
-## 2. Problématique initiale : récupérer les données de prix
-
-### Option A — API externe (ex : DataCar, Argus API)
-- **Avantages :** données réelles, mises à jour automatiquement
-- **Inconvénients :** payantes (à partir de 50€/mois), nécessitent un serveur backend pour cacher la clé API, instables en production scolaire
-- **Décision : écarté** — trop contraignant pour un projet BTS
-
-### Option B — Web scraping (Leboncoin, La Centrale)
-- **Avantages :** données réelles du marché
-- **Inconvénients :** illégal sans autorisation (CGU des sites), résultats instables, nécessite un serveur
-- **Décision : écarté** — cadre juridique non respecté
-
-### Option C — Base JSON embarquée + algorithme de dépréciation ✅
-- **Avantages :** 100 % maîtrisé, fonctionne hors ligne, aucun coût, justifiable à l'oral, données cohérentes avec le marché réel
-- **Inconvénients :** mise à jour manuelle des données
-- **Décision : retenu** — meilleur compromis pour ce contexte
-
----
-
-## 3. Choix des technologies front-end
+## 2. Frontend — Technologies retenues
 
 ### HTML5 / CSS3 / JavaScript ES6
-- Standard du web, aucune dépendance supplémentaire
-- Permettent de livrer un fichier unique `index.html`
-- CSS Grid et Flexbox pour le responsive sans framework
+- Standard du web, sans dépendance ni bundler
+- CSS Grid + Flexbox pour le responsive sans framework
+- ES6 : `async/await`, `fetch()`, modules, arrow functions
 
 **Alternatives étudiées :**
-- React.js → trop lourd pour un fichier unique, nécessite un bundler
-- Vue.js → idem, complexité inutile pour ce périmètre
-- Bootstrap → ajouterait du CSS non maîtrisé, contraire au dark mode custom
 
-### Chart.js (v4.4) via CDN
-- **Pourquoi Chart.js ?** Bibliothèque open-source, légère (60 Ko), très bien documentée, idéale pour des graphiques en ligne simples
-- **Alternatives étudiées :**
-  - D3.js → puissant mais courbe d'apprentissage trop élevée
-  - ApexCharts → plus lourd, moins documenté
-  - Highcharts → payant en usage commercial
-- **Décision : Chart.js retenu** pour sa simplicité et sa documentation claire
+| Alternative | Pourquoi écarté |
+|------------|----------------|
+| React.js | Nécessite bundler (Vite/webpack), complexité inutile |
+| Vue.js | Idem, surcharge pour un projet léger |
+| Bootstrap | CSS générique, contraire au dark mode custom souhaité |
 
-### Google Fonts (Rajdhani + Inter)
-- Rajdhani : police condensée et technique, idéale pour les titres automobile
-- Inter : excellente lisibilité à petite taille pour le texte courant
-- Chargées via CDN, sans impact sur la taille du fichier source
+**Décision :** Vanilla HTML/CSS/JS — simplicité, maîtrise totale, performance maximale.
 
----
+### Chart.js v4.4 (CDN)
+- Bibliothèque open-source, légère (~60 Ko gzippé)
+- Graphiques `line`, `bar`, `pie` — tout ce dont le projet a besoin
+- Documentation claire, nombreux exemples
 
-## 4. Algorithme de dépréciation — recherches effectuées
+**Alternatives étudiées :**
 
-J'ai étudié les modèles de dépréciation utilisés par les professionnels de l'automobile :
-
-| Source | Modèle |
-|---|---|
-| Argus de l'automobile | Dépréciation par tranche d'âge et km, tables de référence |
-| AutoScout24 | Modèle linéaire ajusté par la cote marché |
-| Études CCFA (Comité des Constructeurs Français d'Automobiles) | Taux de dépréciation par catégorie de véhicule |
-
-**Modèle retenu :** dépréciation exponentielle `Prix = PrixNeuf × (1 − taux)^âge` avec ajustement kilométrique, cohérent avec les pratiques observées dans les études sectorielles.
+| Alternative | Pourquoi écarté |
+|------------|----------------|
+| D3.js | Puissant mais courbe d'apprentissage très élevée |
+| ApexCharts | Plus lourd, moins documenté |
+| Highcharts | Payant pour usage commercial |
 
 ---
 
-## 5. Déploiement — solutions étudiées
+## 3. Backend — API REST
 
-| Solution | Avantages | Inconvénients |
-|---|---|---|
-| GitHub Pages | Gratuit, simple, intégration Git | Nécessite un dépôt public |
-| Vercel | Très simple, déploiement automatique, HTTPS | Compte requis |
-| Netlify | Drag & drop du fichier HTML | Compte requis |
-| Hébergement local | Aucun compte nécessaire | Pas accessible en ligne |
+### Vercel Serverless Functions (Node.js 18)
+- Fonctions cloud déclenchées à la demande (0 serveur à gérer)
+- Facturation à l'usage (gratuit jusqu'à 100 000 req/mois)
+- Déploiement automatique à chaque push (ou CLI `npx vercel`)
+- Même plateforme que le frontend → URL unifiée
 
-**Décision : Vercel retenu** — déjà utilisé pour le portfolio `ib-camara.vercel.app`, déploiement en moins de 2 minutes par glisser-déposer du fichier.
+**Alternatives étudiées :**
+
+| Alternative | Pourquoi écarté |
+|------------|----------------|
+| Express.js (VPS) | Serveur à maintenir, coût mensuel, plus complexe |
+| Netlify Functions | Fonctionnement similaire mais moins intégré avec Neon |
+| AWS Lambda | Trop complexe pour un projet léger |
+| Firebase Functions | Dépend de l'écosystème Google, moins standard |
+
+**Décision :** Vercel Serverless — déjà utilisé pour le portfolio, déploiement en < 30 secondes.
 
 ---
 
-## 6. Compétences développées
+## 4. Base de données
 
-| Technologie | Niveau avant | Niveau après |
-|---|---|---|
+### PostgreSQL via Neon (cloud serverless)
+- PostgreSQL standard : langage SQL connu, relationnel, solide
+- Neon : PostgreSQL serverless sur AWS — gratuit jusqu'à 500 Mo
+- Connexion HTTP via `@neondatabase/serverless` (pas de TCP/IP requis)
+- Intégration native avec Vercel Marketplace → variables d'env auto-configurées
+
+**Alternatives étudiées :**
+
+| Alternative | Pourquoi écarté |
+|------------|----------------|
+| MySQL (hébergement local) | Pas accessible depuis le cloud Vercel |
+| SQLite | Pas de cloud, pas adapté au serverless |
+| Firebase Firestore | NoSQL — pas de relationnel, pas de SQL |
+| Supabase | PostgreSQL aussi mais moins intégré à Vercel |
+| MongoDB Atlas | NoSQL — inadapté aux relations entre tables |
+
+**Décision :** Neon + Vercel = stack cloud cohérente, tout gratuit, tout intégré.
+
+### SDK choisi : @neondatabase/serverless
+L'ancienne librairie `@vercel/postgres` a été dépréciée courant 2025.
+Migration vers `@neondatabase/serverless` : connexion HTTP pure, compatible avec les Serverless Functions sans WebSocket.
+
+---
+
+## 5. Algorithme de dépréciation — recherches
+
+### Sources consultées
+
+| Source | Apport |
+|--------|--------|
+| Argus de l'automobile | Méthode de calcul par tranche d'âge et kilométrage |
+| AutoScout24 Market Report 2024 | Taux de dépréciation par catégorie (EV, diesel, SUV) |
+| CCFA — Comité des Constructeurs Français | Données sectorielles de revente |
+| LaCentrale.fr — Côtes 2024–2025 | Calibrage des prix de référence par modèle |
+| Études Deloitte — Marché VO 2024 | Impact du carburant sur la valeur résiduelle |
+
+### Modèle retenu
+
+```
+Prix = PrixNeuf × (1 − TauxDépréciation)^âge
+     × CoefKilométrique
+     × Modificateur(carburant)
+     × Modificateur(boîte)
+     × Modificateur(couleur)
+     + ΣOptions
+     × Modificateur(historique)
+```
+
+**Justification des taux par carburant (2025–2026) :**
+- Diesel : −6% vs essence (restrictions ZFE, images négative, demande en baisse)
+- Hybride : +6% (prime verte, demande soutenue)
+- Électrique : −12% (dépréciation forte : recharge, autonomie, incertitudes technologiques)
+- GPL : −15% (niche, peu de repreneurs)
+
+---
+
+## 6. Déploiement — solutions comparées
+
+| Solution | Avantages | Inconvénients | Verdict |
+|----------|-----------|--------------|---------|
+| Vercel | CLI simple, HTTPS auto, Serverless inclus, Neon intégré | — | ✅ **Retenu** |
+| GitHub Pages | Gratuit, simple | Statique seulement, pas d'API | ✗ |
+| Netlify | Drag & drop | Moins intégré avec Neon | ✗ |
+| Railway | Backend + DB | Payant au-delà de la période gratuite | ✗ |
+| Render | Similaire à Railway | Mise en veille après inactivité | ✗ |
+
+---
+
+## 7. Compétences développées
+
+| Compétence | Niveau avant | Niveau après |
+|-----------|-------------|-------------|
+| Architecture 3-tiers (Frontend/API/DB) | Débutant | Intermédiaire |
+| Node.js Serverless Functions | Débutant | Intermédiaire |
+| PostgreSQL (SQL, schéma, relations) | Intermédiaire | Avancé |
+| API REST (GET/POST, JSON, status codes) | Débutant | Intermédiaire |
+| Déploiement cloud (Vercel + Neon) | Débutant | Intermédiaire |
 | Chart.js | Débutant | Intermédiaire |
-| CSS Variables & Dark mode | Débutant | Intermédiaire |
-| Algorithmique JS (dépréciation) | Intermédiaire | Avancé |
-| Responsive CSS Grid/Flexbox | Intermédiaire | Avancé |
-| Manipulation DOM JavaScript | Intermédiaire | Avancé |
+| Algorithme dépréciation (JS) | Intermédiaire | Avancé |
+| CSS Variables, Dark mode, Responsive | Intermédiaire | Avancé |
 
 ---
 
-## 7. Sources de veille consultées
+## 8. Sources de veille
 
 - MDN Web Docs — [developer.mozilla.org](https://developer.mozilla.org)
-- Documentation officielle Chart.js — [chartjs.org/docs](https://www.chartjs.org/docs)
-- CSS-Tricks — articles sur les CSS variables et dark mode
-- Journal du Net / CCFA — données de dépréciation automobile marché français
-- Stack Overflow — résolution de problèmes techniques
+- Documentation Neon — [neon.tech/docs](https://neon.tech/docs)
+- Documentation Vercel Serverless — [vercel.com/docs/functions](https://vercel.com/docs/functions)
+- Documentation Chart.js — [chartjs.org/docs](https://www.chartjs.org/docs)
+- LaCentrale.fr — côtes véhicules 2024–2025
+- AutoScout24 Market Report — dépréciation par segment

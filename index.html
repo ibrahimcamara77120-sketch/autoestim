@@ -4,316 +4,215 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AutoEstim — Estimateur de prix de revente</title>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
   <style>
-    /* ===================== RESET & BASE ===================== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:        #0f0f0f;
-      --surface:   #1a1a1a;
-      --surface2:  #222222;
-      --border:    #2e2e2e;
-      --red:       #e63946;
-      --red-glow:  rgba(230, 57, 70, 0.25);
-      --text:      #f0f0f0;
-      --muted:     #888;
-      --green:     #2ecc71;
-      --orange:    #f39c12;
-      --radius:    12px;
+      --bg:       #0f0f0f; --surface:  #1a1a1a; --surface2: #222222;
+      --border:   #2e2e2e; --red:      #e63946; --red-glow: rgba(230,57,70,.25);
+      --text:     #f0f0f0; --muted:    #888;    --green:    #2ecc71;
+      --orange:   #f39c12; --blue:     #3498db; --radius:   12px;
     }
-
     html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:24px 16px 80px; }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 24px 16px 60px;
-    }
+    /* HEADER */
+    header { text-align:center; margin-bottom:32px; }
+    .logo-wrap { display:inline-flex; align-items:center; gap:14px; margin-bottom:8px; }
+    .car-icon svg { width:54px; height:54px; filter:drop-shadow(0 0 10px var(--red)); }
+    header h1 { font-family:'Rajdhani',sans-serif; font-size:clamp(2rem,6vw,3.2rem); font-weight:700; letter-spacing:2px; }
+    header h1 span { color:var(--red); }
+    header p { color:var(--muted); font-size:.95rem; margin-top:4px; }
 
-    /* ===================== HEADER ===================== */
-    header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .logo-wrap {
-      display: inline-flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 8px;
-    }
-
-    .car-icon svg {
-      width: 54px;
-      height: 54px;
-      filter: drop-shadow(0 0 10px var(--red));
-    }
-
-    header h1 {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: clamp(2rem, 6vw, 3.2rem);
-      font-weight: 700;
-      letter-spacing: 2px;
-    }
-
-    header h1 span { color: var(--red); }
-
-    header p {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-top: 4px;
-    }
-
-    /* ===================== CARD PRINCIPALE ===================== */
+    /* CARD */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      max-width: 760px;
-      margin: 0 auto 32px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+      padding:28px 32px; max-width:820px; margin:0 auto 20px;
+      box-shadow:0 8px 40px rgba(0,0,0,.5);
     }
 
-    /* ===================== ETAPES ===================== */
+    /* STEP LABELS */
     .step-label {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 6px;
+      font-family:'Rajdhani',sans-serif; font-size:.72rem; font-weight:600;
+      letter-spacing:2px; text-transform:uppercase; color:var(--red); margin-bottom:6px;
+    }
+    .section-label {
+      font-family:'Rajdhani',sans-serif; font-size:.72rem; font-weight:600;
+      letter-spacing:2px; text-transform:uppercase; color:var(--muted);
+      padding-bottom:10px; border-bottom:1px solid var(--border); margin-bottom:16px;
     }
 
-    .step-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
+    /* GRIDS */
+    .step-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+    .step-item { display:flex; flex-direction:column; }
 
-    .step-item { display: flex; flex-direction: column; }
-
-    /* ===================== INPUTS & SELECTS ===================== */
+    /* SELECTS + INPUTS */
     select, input[type="number"] {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
-      padding: 12px 14px;
-      width: 100%;
-      appearance: none;
-      -webkit-appearance: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      cursor: pointer;
+      background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+      color:var(--text); font-family:'Inter',sans-serif; font-size:.95rem;
+      padding:12px 14px; width:100%; appearance:none; -webkit-appearance:none;
+      transition:border-color .2s,box-shadow .2s; cursor:pointer;
     }
-
     select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 38px;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 14px center; padding-right:38px;
+    }
+    select:focus, input[type="number"]:focus { outline:none; border-color:var(--red); box-shadow:0 0 0 3px var(--red-glow); }
+    select:disabled { opacity:.4; cursor:not-allowed; }
+    input[type="number"]::-webkit-inner-spin-button { display:none; }
+
+    /* CHIPS */
+    .chips-row { display:flex; flex-wrap:wrap; gap:7px; }
+    .chip {
+      background:var(--surface2); border:1px solid var(--border); border-radius:6px;
+      color:var(--muted); cursor:pointer; font-size:.78rem; font-weight:500;
+      padding:7px 13px; transition:all .15s; user-select:none;
+    }
+    .chip:hover { border-color:#555; color:var(--text); }
+    .chip.active { background:rgba(230,57,70,.13); border-color:var(--red); color:var(--red); }
+
+    /* REVEAL SECTIONS */
+    .reveal-section { display:none; margin-top:22px; }
+    .reveal-section.visible { display:block; animation:fadeUp .35s ease both; }
+
+    /* ADVANCED TOGGLE */
+    .btn-avance {
+      background:none; border:1px dashed var(--border); border-radius:8px;
+      color:var(--muted); cursor:pointer; font-family:'Inter',sans-serif; font-size:.8rem;
+      padding:10px 18px; margin-top:16px; transition:all .2s; width:100%; text-align:left;
+    }
+    .btn-avance:hover { border-color:#555; color:var(--text); }
+    .adv-count {
+      background:var(--red); border-radius:10px; color:#fff; font-size:.65rem;
+      font-weight:700; margin-left:8px; padding:2px 7px;
     }
 
-    select:focus, input[type="number"]:focus {
-      outline: none;
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px var(--red-glow);
+    /* COLOR SWATCHES */
+    .color-grid { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; margin-top:4px; }
+    .color-swatch-wrap { display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; }
+    .color-swatch {
+      width:34px; height:34px; border-radius:50%; border:2px solid transparent;
+      transition:transform .15s,border-color .15s;
     }
+    .color-swatch-wrap:hover .color-swatch { transform:scale(1.18); }
+    .color-swatch-wrap.active .color-swatch { border-color:var(--text); transform:scale(1.18); }
+    .color-swatch-wrap span { color:var(--muted); font-size:.62rem; white-space:nowrap; }
 
-    select:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    input[type="number"]::-webkit-inner-spin-button { display: none; }
-
-    /* ===================== DIVISEUR ===================== */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 28px 0;
+    /* OPTIONS */
+    .options-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:7px; }
+    .option-card {
+      background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+      cursor:pointer; display:flex; align-items:center; gap:9px;
+      padding:9px 12px; transition:border-color .15s,background .15s; user-select:none;
     }
+    .option-card:hover { border-color:#555; }
+    .option-card.checked { background:rgba(230,57,70,.08); border-color:var(--red); }
+    .option-card .opt-icon { font-size:.95rem; }
+    .option-card .opt-txt { flex:1; }
+    .option-card .opt-label { color:var(--muted); font-size:.75rem; font-weight:500; line-height:1.2; }
+    .option-card.checked .opt-label { color:var(--text); }
+    .option-card .opt-price { color:var(--green); font-size:.65rem; }
 
-    /* ===================== BOUTON ESTIMER ===================== */
+    /* TOGGLE PAIRS */
+    .toggle-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:12px; }
+    .toggle-item { display:flex; flex-direction:column; gap:6px; }
+    .toggle-item-label { color:var(--muted); font-size:.73rem; font-weight:500; }
+    .toggle-pair { display:flex; gap:6px; }
+    .toggle-btn {
+      background:var(--surface2); border:1px solid var(--border); border-radius:6px;
+      color:var(--muted); cursor:pointer; flex:1; font-size:.78rem;
+      font-weight:500; padding:8px; text-align:center; transition:all .15s; user-select:none;
+    }
+    .toggle-btn:hover { border-color:#555; color:var(--text); }
+    .toggle-btn.oui { background:rgba(46,204,113,.1); border-color:var(--green); color:var(--green); }
+    .toggle-btn.non { background:rgba(230,57,70,.08); border-color:var(--red); color:var(--red); }
+
+    /* RANGE CV */
+    .range-wrap { display:flex; align-items:center; gap:12px; }
+    .range-wrap input[type="range"] { flex:1; accent-color:var(--red); cursor:pointer; }
+    .range-val { background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--red); font-family:'Rajdhani',sans-serif; font-size:.95rem; font-weight:700; min-width:70px; padding:6px 10px; text-align:center; }
+
+    /* DIVIDER */
+    .divider { border:none; border-top:1px solid var(--border); margin:24px 0; }
+
+    /* BTN ESTIMER */
     .btn-estimate {
-      display: block;
-      width: 100%;
-      background: var(--red);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 16px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      display:block; width:100%; background:var(--red); color:#fff; border:none;
+      border-radius:8px; font-family:'Rajdhani',sans-serif; font-size:1.15rem;
+      font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:16px;
+      cursor:pointer; transition:background .2s,transform .1s,box-shadow .2s;
+    }
+    .btn-estimate:hover { background:#c62e3a; box-shadow:0 0 20px var(--red-glow); }
+    .btn-estimate:active { transform:scale(.98); }
+
+    /* RESULTS */
+    #results { display:none; max-width:820px; margin:0 auto; }
+    .etat-wrap { text-align:center; margin-bottom:24px; }
+    .etat-label { font-size:.8rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+    .badge { display:inline-block; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1rem; letter-spacing:1.5px; padding:6px 20px; border-radius:50px; text-transform:uppercase; }
+    .badge-excellent { background:rgba(46,204,113,.15); color:#2ecc71; border:1px solid rgba(46,204,113,.35); }
+    .badge-bon       { background:rgba(52,152,219,.15); color:#3498db; border:1px solid rgba(52,152,219,.35); }
+    .badge-correct   { background:rgba(243,156,18,.15); color:#f39c12; border:1px solid rgba(243,156,18,.35); }
+    .badge-fatigue   { background:rgba(231,76,60,.15);  color:#e74c3c; border:1px solid rgba(231,76,60,.35); }
+
+    /* PRICE CARDS */
+    .price-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
+    .price-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px 16px; text-align:center; transition:transform .2s; }
+    .price-card:hover { transform:translateY(-3px); }
+    .price-card.high { border-top:3px solid var(--green); }
+    .price-card.mid  { border-top:3px solid var(--text); }
+    .price-card.low  { border-top:3px solid var(--orange); }
+    .price-card .card-label { font-size:.7rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .price-card .price-val  { font-family:'Rajdhani',sans-serif; font-size:1.9rem; font-weight:700; line-height:1; }
+    .price-card.high .price-val { color:var(--green); }
+    .price-card.low  .price-val { color:var(--orange); }
+    .price-card .price-sub  { font-size:.75rem; color:var(--muted); margin-top:5px; }
+
+    /* BREAKDOWN */
+    .breakdown-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:20px 24px; margin-bottom:20px; }
+    .breakdown-title { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:600; letter-spacing:1px; margin-bottom:14px; color:var(--muted); text-transform:uppercase; }
+    .breakdown-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:.83rem; }
+    .breakdown-row:last-child { border-bottom:none; padding-top:12px; font-weight:600; }
+    .br-label { color:var(--muted); }
+    .br-val { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; }
+    .br-plus  { color:var(--green); }
+    .br-minus { color:var(--orange); }
+    .br-total { color:var(--text); font-size:1.1rem; }
+
+    /* CHART */
+    .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; margin-bottom:16px; }
+    .chart-title { font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:600; letter-spacing:1px; margin-bottom:20px; }
+    .chart-title span { color:var(--red); }
+    canvas { max-height:300px; }
+
+    /* VEHICLE INFO */
+    .vehicle-info { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:14px 18px; margin-bottom:18px; display:flex; flex-wrap:wrap; gap:10px 24px; font-size:.83rem; color:var(--muted); }
+    .vehicle-info strong { color:var(--text); }
+
+    .disclaimer { text-align:center; font-size:.75rem; color:var(--muted); margin-top:18px; }
+
+    /* RESPONSIVE */
+    @media(max-width:560px) {
+      .step-grid  { grid-template-columns:1fr; }
+      .price-grid { grid-template-columns:1fr; }
+      .card { padding:18px 16px; }
+      .options-grid { grid-template-columns:1fr 1fr; }
     }
 
-    .btn-estimate:hover { background: #c62e3a; box-shadow: 0 0 20px var(--red-glow); }
-    .btn-estimate:active { transform: scale(0.98); }
-
-    /* ===================== SECTION RESULTATS ===================== */
-    #results { display: none; max-width: 760px; margin: 0 auto; }
-
-    /* Badge etat */
-    .etat-wrap { text-align: center; margin-bottom: 28px; }
-
-    .etat-label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .badge {
-      display: inline-block;
-      font-family: 'Rajdhani', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 1.5px;
-      padding: 6px 20px;
-      border-radius: 50px;
-      text-transform: uppercase;
-    }
-
-    .badge-excellent { background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.35); }
-    .badge-bon       { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid rgba(52,152,219,0.35); }
-    .badge-correct   { background: rgba(243,156,18,0.15); color: #f39c12; border: 1px solid rgba(243,156,18,0.35); }
-    .badge-fatigue   { background: rgba(231,76,60,0.15);  color: #e74c3c; border: 1px solid rgba(231,76,60,0.35); }
-
-    /* Cards prix */
-    .price-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .price-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 16px;
-      text-align: center;
-      transition: transform 0.2s;
-    }
-
-    .price-card:hover { transform: translateY(-3px); }
-
-    .price-card.high { border-top: 3px solid var(--green); }
-    .price-card.mid  { border-top: 3px solid var(--text);  }
-    .price-card.low  { border-top: 3px solid var(--orange); }
-
-    .price-card .card-label {
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .price-card .price-val {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.9rem;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .price-card.high .price-val { color: var(--green); }
-    .price-card.low  .price-val { color: var(--orange); }
-
-    .price-card .price-sub {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 5px;
-    }
-
-    /* ===================== CARTE GRAPHIQUE ===================== */
-    .chart-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin-bottom: 16px;
-    }
-
-    .chart-title {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: var(--text);
-      margin-bottom: 20px;
-    }
-
-    .chart-title span { color: var(--red); }
-
-    canvas { max-height: 300px; }
-
-    /* ===================== INFO VEHICULE ===================== */
-    .vehicle-info {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      margin-bottom: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px 28px;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    .vehicle-info strong { color: var(--text); }
-
-    /* ===================== NOTE DE BAS ===================== */
-    .disclaimer {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 20px;
-    }
-
-    /* ===================== RESPONSIVE ===================== */
-    @media (max-width: 540px) {
-      .step-grid  { grid-template-columns: 1fr; }
-      .price-grid { grid-template-columns: 1fr; }
-      .card       { padding: 20px 16px; }
-    }
-
-    /* ===================== ANIMATION COMPTEUR ===================== */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0);    }
-    }
-
-    .price-card { animation: fadeUp 0.45s ease both; }
-    .price-card:nth-child(1) { animation-delay: 0.05s; }
-    .price-card:nth-child(2) { animation-delay: 0.15s; }
-    .price-card:nth-child(3) { animation-delay: 0.25s; }
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .price-card { animation:fadeUp .45s ease both; }
+    .price-card:nth-child(1) { animation-delay:.05s; }
+    .price-card:nth-child(2) { animation-delay:.15s; }
+    .price-card:nth-child(3) { animation-delay:.25s; }
   </style>
 </head>
 <body>
 
-<!-- ==================== HEADER ==================== -->
 <header>
   <div class="logo-wrap">
     <div class="car-icon">
-      <!-- Icone voiture SVG -->
       <svg viewBox="0 0 64 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="8" y="18" width="48" height="16" rx="4" fill="#e63946"/>
         <path d="M14 18 L20 6 H44 L50 18" fill="#c62e3a" stroke="#e63946" stroke-width="1.5" stroke-linejoin="round"/>
@@ -321,469 +220,937 @@
         <circle cx="46" cy="34" r="6" fill="#1a1a1a" stroke="#e63946" stroke-width="2"/>
         <circle cx="18" cy="34" r="2.5" fill="#e63946"/>
         <circle cx="46" cy="34" r="2.5" fill="#e63946"/>
-        <rect x="22" y="9" width="10" height="8" rx="2" fill="#1a1a1a" opacity="0.6"/>
-        <rect x="34" y="9" width="10" height="8" rx="2" fill="#1a1a1a" opacity="0.6"/>
-        <rect x="4"  y="22" width="6" height="4" rx="1" fill="#f0f0f0" opacity="0.8"/>
-        <rect x="54" y="22" width="6" height="4" rx="1" fill="#f39c12" opacity="0.8"/>
+        <rect x="22" y="9" width="10" height="8" rx="2" fill="#1a1a1a" opacity=".6"/>
+        <rect x="34" y="9" width="10" height="8" rx="2" fill="#1a1a1a" opacity=".6"/>
+        <rect x="4"  y="22" width="6" height="4" rx="1" fill="#f0f0f0" opacity=".8"/>
+        <rect x="54" y="22" width="6" height="4" rx="1" fill="#f39c12" opacity=".8"/>
       </svg>
     </div>
     <h1><span>Auto</span>Estim</h1>
   </div>
-  <p>Estimateur de prix de revente automobile &mdash; Marche francais</p>
+  <p>Estimateur de prix de revente automobile &mdash; 28 marques &bull; 200+ mod&egrave;les &bull; Algorithme avanc&eacute;</p>
 </header>
 
-<!-- ==================== FORMULAIRE ==================== -->
+<!-- FORMULAIRE PRINCIPAL -->
 <div class="card">
 
-  <!-- Etapes : Marque + Modele -->
+  <!-- 01 Marque + 02 Modèle -->
   <div class="step-grid">
     <div class="step-item">
       <div class="step-label">01 &mdash; Marque</div>
       <select id="sel-marque" onchange="onMarqueChange()">
-        <option value="">Selectionner une marque</option>
+        <option value="">S&eacute;lectionner une marque</option>
       </select>
     </div>
     <div class="step-item">
-      <div class="step-label">02 &mdash; Modele</div>
+      <div class="step-label">02 &mdash; Mod&egrave;le</div>
       <select id="sel-modele" onchange="onModeleChange()" disabled>
-        <option value="">Selectionner un modele</option>
+        <option value="">S&eacute;lectionner un mod&egrave;le</option>
       </select>
     </div>
   </div>
 
-  <!-- Etapes : Annee + Kilometrage -->
-  <div class="step-grid">
-    <div class="step-item">
-      <div class="step-label">03 &mdash; Annee</div>
-      <select id="sel-annee" disabled>
-        <option value="">Selectionner une annee</option>
-      </select>
-    </div>
-    <div class="step-item">
-      <div class="step-label">04 &mdash; Kilometrage</div>
-      <input type="number" id="inp-km" placeholder="Ex : 85000" min="0" max="999999" disabled />
+  <!-- 03 Carburant + 04 Boîte (révélés après sélection modèle) -->
+  <div id="sec-motorisation" class="reveal-section">
+    <div class="section-label">Motorisation</div>
+    <div class="step-grid">
+      <div class="step-item">
+        <div class="step-label">03 &mdash; Carburant</div>
+        <div class="chips-row" id="chips-carb"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-label">04 &mdash; Bo&icirc;te de vitesses</div>
+        <div class="chips-row" id="chips-boite">
+          <span class="chip" data-group="boite" data-val="Manuelle"      onclick="selectChip(this)">&#9881; Manuelle</span>
+          <span class="chip" data-group="boite" data-val="Automatique"   onclick="selectChip(this)">&#129302; Automatique</span>
+          <span class="chip" data-group="boite" data-val="S&eacute;quentielle" onclick="selectChip(this)">&#127937; S&eacute;quentielle</span>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- 05 Année + 06 Kilométrage -->
+  <div id="sec-annee-km" class="reveal-section">
+    <div class="section-label">État du v&eacute;hicule</div>
+    <div class="step-grid">
+      <div class="step-item">
+        <div class="step-label">05 &mdash; Ann&eacute;e</div>
+        <select id="sel-annee">
+          <option value="">S&eacute;lectionner une ann&eacute;e</option>
+        </select>
+      </div>
+      <div class="step-item">
+        <div class="step-label">06 &mdash; Kilom&eacute;trage</div>
+        <input type="number" id="inp-km" placeholder="Ex : 75000" min="0" max="999999" />
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUTON FILTRES AVANCÉS -->
+  <button class="btn-avance" id="btn-avance" onclick="toggleAvance()" style="display:none;">
+    &#9881; Crit&egrave;res avanc&eacute;s &mdash; couleur, options, historique
+    <span class="adv-count" id="adv-count" style="display:none">0</span>
+    <span id="adv-arrow" style="float:right">&#9660;</span>
+  </button>
+
+  <!-- SECTION AVANCÉE (cachée par défaut) -->
+  <div id="sec-avance" style="display:none; margin-top:20px;">
+
+    <!-- 07 Puissance + 08 Nb portes -->
+    <div class="section-label">Caract&eacute;ristiques</div>
+    <div class="step-grid" style="margin-bottom:20px;">
+      <div class="step-item">
+        <div class="step-label">07 &mdash; Puissance (CV)</div>
+        <div class="range-wrap">
+          <input type="range" id="inp-cv" min="50" max="600" value="100" step="5" oninput="updateCV(this)">
+          <div class="range-val" id="cv-val">100 CV</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-label">08 &mdash; Nombre de portes</div>
+        <div class="chips-row">
+          <span class="chip" data-group="portes" data-val="2" onclick="selectChip(this)">2 portes</span>
+          <span class="chip" data-group="portes" data-val="3" onclick="selectChip(this)">3 portes</span>
+          <span class="chip active" data-group="portes" data-val="5" onclick="selectChip(this)">5 portes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 09 Couleur -->
+    <div class="section-label">Couleur ext&eacute;rieure</div>
+    <div class="color-grid" style="margin-bottom:24px;">
+      <div class="color-swatch-wrap" data-couleur="blanc"  onclick="selectCouleur(this)"><div class="color-swatch" style="background:#f0f0f0;"></div><span>Blanc</span></div>
+      <div class="color-swatch-wrap" data-couleur="noir"   onclick="selectCouleur(this)"><div class="color-swatch" style="background:#1a1a1a;border:1px solid #444;"></div><span>Noir</span></div>
+      <div class="color-swatch-wrap" data-couleur="gris"   onclick="selectCouleur(this)"><div class="color-swatch" style="background:#888;"></div><span>Gris</span></div>
+      <div class="color-swatch-wrap" data-couleur="argent" onclick="selectCouleur(this)"><div class="color-swatch" style="background:linear-gradient(135deg,#c0c0c0,#e8e8e8);"></div><span>Argent</span></div>
+      <div class="color-swatch-wrap" data-couleur="bleu"   onclick="selectCouleur(this)"><div class="color-swatch" style="background:#2980b9;"></div><span>Bleu</span></div>
+      <div class="color-swatch-wrap" data-couleur="rouge"  onclick="selectCouleur(this)"><div class="color-swatch" style="background:#c0392b;"></div><span>Rouge</span></div>
+      <div class="color-swatch-wrap" data-couleur="vert"   onclick="selectCouleur(this)"><div class="color-swatch" style="background:#27ae60;"></div><span>Vert</span></div>
+      <div class="color-swatch-wrap" data-couleur="orange" onclick="selectCouleur(this)"><div class="color-swatch" style="background:#e67e22;"></div><span>Orange</span></div>
+      <div class="color-swatch-wrap" data-couleur="beige"  onclick="selectCouleur(this)"><div class="color-swatch" style="background:#d4c4a8;"></div><span>Beige</span></div>
+      <div class="color-swatch-wrap" data-couleur="marron" onclick="selectCouleur(this)"><div class="color-swatch" style="background:#7d5533;"></div><span>Marron</span></div>
+      <div class="color-swatch-wrap" data-couleur="jaune"  onclick="selectCouleur(this)"><div class="color-swatch" style="background:#f1c40f;"></div><span>Jaune</span></div>
+      <div class="color-swatch-wrap" data-couleur="violet" onclick="selectCouleur(this)"><div class="color-swatch" style="background:#8e44ad;"></div><span>Violet</span></div>
+    </div>
+
+    <!-- 10 Options -->
+    <div class="section-label">Options &amp; &eacute;quipements</div>
+    <div class="options-grid" style="margin-bottom:24px;">
+      <div class="option-card" data-opt="gps"        onclick="toggleOption(this)"><span class="opt-icon">&#127757;</span><div class="opt-txt"><div class="opt-label">GPS / Navigation</div><div class="opt-price">+400 &euro;</div></div></div>
+      <div class="option-card" data-opt="cuir"       onclick="toggleOption(this)"><span class="opt-icon">&#129531;</span><div class="opt-txt"><div class="opt-label">Sellerie cuir</div><div class="opt-price">+800 &euro;</div></div></div>
+      <div class="option-card" data-opt="toit"       onclick="toggleOption(this)"><span class="opt-icon">&#9728;</span><div class="opt-txt"><div class="opt-label">Toit panoramique</div><div class="opt-price">+700 &euro;</div></div></div>
+      <div class="option-card" data-opt="camera"     onclick="toggleOption(this)"><span class="opt-icon">&#128247;</span><div class="opt-txt"><div class="opt-label">Cam&eacute;ra 360&deg;</div><div class="opt-price">+300 &euro;</div></div></div>
+      <div class="option-card" data-opt="chauffants" onclick="toggleOption(this)"><span class="opt-icon">&#128293;</span><div class="opt-txt"><div class="opt-label">Si&egrave;ges chauffants</div><div class="opt-price">+350 &euro;</div></div></div>
+      <div class="option-card" data-opt="parking"    onclick="toggleOption(this)"><span class="opt-icon">&#128663;</span><div class="opt-txt"><div class="opt-label">Aide parking</div><div class="opt-price">+300 &euro;</div></div></div>
+      <div class="option-card" data-opt="hiver"      onclick="toggleOption(this)"><span class="opt-icon">&#10052;</span><div class="opt-txt"><div class="opt-label">Pack hiver</div><div class="opt-price">+200 &euro;</div></div></div>
+      <div class="option-card" data-opt="attelage"   onclick="toggleOption(this)"><span class="opt-icon">&#128722;</span><div class="opt-txt"><div class="opt-label">Attelage</div><div class="opt-price">+400 &euro;</div></div></div>
+      <div class="option-card" data-opt="jantes"     onclick="toggleOption(this)"><span class="opt-icon">&#9899;</span><div class="opt-txt"><div class="opt-label">Jantes alu &gt;17&quot;</div><div class="opt-price">+350 &euro;</div></div></div>
+      <div class="option-card" data-opt="acc"        onclick="toggleOption(this)"><span class="opt-icon">&#128007;</span><div class="opt-txt"><div class="opt-label">R&eacute;gulateur adaptatif</div><div class="opt-price">+400 &euro;</div></div></div>
+      <div class="option-card" data-opt="lane"       onclick="toggleOption(this)"><span class="opt-icon">&#8592;&#8594;</span><div class="opt-txt"><div class="opt-label">Aide maintien voie</div><div class="opt-price">+250 &euro;</div></div></div>
+      <div class="option-card" data-opt="keyless"    onclick="toggleOption(this)"><span class="opt-icon">&#128273;</span><div class="opt-txt"><div class="opt-label">Keyless / sans cl&eacute;</div><div class="opt-price">+300 &euro;</div></div></div>
+    </div>
+
+    <!-- 11 Historique -->
+    <div class="section-label">Historique du v&eacute;hicule</div>
+    <div class="toggle-grid">
+      <div class="toggle-item">
+        <div class="toggle-item-label">1&egrave;re main</div>
+        <div class="toggle-pair">
+          <span class="toggle-btn" data-tog="premiere" data-val="oui" onclick="selectToggle(this)">Oui +6%</span>
+          <span class="toggle-btn" data-tog="premiere" data-val="non" onclick="selectToggle(this)">Non</span>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <div class="toggle-item-label">Carnet d'entretien complet</div>
+        <div class="toggle-pair">
+          <span class="toggle-btn" data-tog="carnet" data-val="oui" onclick="selectToggle(this)">Oui +3%</span>
+          <span class="toggle-btn" data-tog="carnet" data-val="non" onclick="selectToggle(this)">Non</span>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <div class="toggle-item-label">Garantie constructeur restante</div>
+        <div class="toggle-pair">
+          <span class="toggle-btn" data-tog="garantie" data-val="oui" onclick="selectToggle(this)">Oui +4%</span>
+          <span class="toggle-btn" data-tog="garantie" data-val="non" onclick="selectToggle(this)">Non</span>
+        </div>
+      </div>
+      <div class="toggle-item">
+        <div class="toggle-item-label">V&eacute;hicule accident&eacute;</div>
+        <div class="toggle-pair">
+          <span class="toggle-btn" data-tog="accident" data-val="non"  onclick="selectToggle(this)">Non</span>
+          <span class="toggle-btn" data-tog="accident" data-val="leger" onclick="selectToggle(this)">L&eacute;ger -8%</span>
+          <span class="toggle-btn" data-tog="accident" data-val="grave" onclick="selectToggle(this)">Grave -20%</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sec-avance -->
 
   <hr class="divider" />
   <button class="btn-estimate" onclick="estimer()">&#9889; Estimer le prix de revente</button>
 </div>
 
-<!-- ==================== RESULTATS ==================== -->
+<!-- RÉSULTATS -->
 <div id="results">
-
-  <!-- Info vehicule recapitulatif -->
   <div class="vehicle-info" id="vehicle-summary"></div>
 
-  <!-- Badge etat -->
   <div class="etat-wrap">
-    <div class="etat-label">Etat general estime</div>
+    <div class="etat-label">État g&eacute;n&eacute;ral estim&eacute;</div>
     <span class="badge" id="badge-etat"></span>
   </div>
 
-  <!-- 3 cards de prix -->
   <div class="price-grid">
     <div class="price-card high">
       <div class="card-label">Prix haut</div>
       <div class="price-val" id="prix-haut">&mdash;</div>
-      <div class="price-sub">Excellent etat / Faible km</div>
+      <div class="price-sub">Excellent &eacute;tat / Faible km</div>
     </div>
     <div class="price-card mid">
       <div class="card-label">Prix moyen</div>
       <div class="price-val" id="prix-moyen">&mdash;</div>
-      <div class="price-sub">Estimation marche</div>
+      <div class="price-sub">Estimation march&eacute;</div>
     </div>
     <div class="price-card low">
       <div class="card-label">Prix bas</div>
       <div class="price-val" id="prix-bas">&mdash;</div>
-      <div class="price-sub">Etat moyen / Kilometrage eleve</div>
+      <div class="price-sub">&Eacute;tat moyen / Kilom&eacute;trage &eacute;lev&eacute;</div>
     </div>
   </div>
 
-  <!-- Graphique depreciation -->
+  <!-- Breakdown détail du calcul -->
+  <div class="breakdown-card">
+    <div class="breakdown-title">D&eacute;tail du calcul</div>
+    <div id="breakdown-rows"></div>
+  </div>
+
   <div class="chart-card">
-    <div class="chart-title">Courbe de depreciation &mdash; <span id="chart-title-model">modele</span></div>
+    <div class="chart-title">Courbe de d&eacute;pr&eacute;ciation &mdash; <span id="chart-title-model">mod&egrave;le</span></div>
     <canvas id="chartDeprec"></canvas>
   </div>
 
   <div class="disclaimer">
-    Les estimations sont calculees par algorithme a titre indicatif. Elles ne remplacent pas une expertise professionnelle.
-    Les prix reels varient selon l'etat du vehicule, l'equipement et le marche local.
+    Estimations calcul&eacute;es par algorithme &agrave; titre indicatif. Elles ne remplacent pas une expertise professionnelle.
+    Les prix r&eacute;els varient selon l&rsquo;&eacute;tat, l&rsquo;&eacute;quipement et le march&eacute; local.
   </div>
 </div>
 
-
 <script>
-/* =====================================================================
-   BASE DE DONNEES VEHICULES (JSON embarque)
-   prixNeuf        : prix catalogue neuf en euros
-   depreciationAnn : taux de depreciation annuelle (entre 0 et 1)
-   kmMoyenAnnuel   : kilometrage moyen annuel de reference
-   ===================================================================== */
-const VEHICULES = {
-  "Renault": {
-    "Clio":    { prixNeuf: 18500, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
-    "Megane":  { prixNeuf: 23000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
-    "Kadjar":  { prixNeuf: 28000, depreciationAnn: 0.14, kmMoyenAnnuel: 16000 },
-    "Captur":  { prixNeuf: 22500, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
-    "Zoe":     { prixNeuf: 32000, depreciationAnn: 0.16, kmMoyenAnnuel: 12000 }
-  },
-  "Peugeot": {
-    "208":   { prixNeuf: 20000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
-    "308":   { prixNeuf: 26000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
-    "3008":  { prixNeuf: 34000, depreciationAnn: 0.13, kmMoyenAnnuel: 16000 },
-    "5008":  { prixNeuf: 38000, depreciationAnn: 0.12, kmMoyenAnnuel: 16000 }
-  },
-  "Citroen": {
-    "C3":          { prixNeuf: 17000, depreciationAnn: 0.13, kmMoyenAnnuel: 14000 },
-    "C5 Aircross": { prixNeuf: 32000, depreciationAnn: 0.13, kmMoyenAnnuel: 16000 },
-    "C4":          { prixNeuf: 25000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 }
-  },
-  "Volkswagen": {
-    "Polo":   { prixNeuf: 22000, depreciationAnn: 0.11, kmMoyenAnnuel: 14000 },
-    "Golf":   { prixNeuf: 30000, depreciationAnn: 0.10, kmMoyenAnnuel: 15000 },
-    "Tiguan": { prixNeuf: 38000, depreciationAnn: 0.11, kmMoyenAnnuel: 16000 },
-    "T-Roc":  { prixNeuf: 32000, depreciationAnn: 0.11, kmMoyenAnnuel: 15000 }
-  },
-  "BMW": {
-    "Serie 1": { prixNeuf: 35000, depreciationAnn: 0.14, kmMoyenAnnuel: 15000 },
-    "Serie 3": { prixNeuf: 48000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
-    "Serie 5": { prixNeuf: 62000, depreciationAnn: 0.13, kmMoyenAnnuel: 16000 }
-  },
-  "Mercedes": {
-    "Classe A": { prixNeuf: 38000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 },
-    "Classe C": { prixNeuf: 52000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
-    "GLA":      { prixNeuf: 44000, depreciationAnn: 0.13, kmMoyenAnnuel: 15000 }
-  },
-  "Toyota": {
-    "Yaris":       { prixNeuf: 20000, depreciationAnn: 0.10, kmMoyenAnnuel: 13000 },
-    "Corolla":     { prixNeuf: 27000, depreciationAnn: 0.10, kmMoyenAnnuel: 15000 },
-    "RAV4":        { prixNeuf: 38000, depreciationAnn: 0.11, kmMoyenAnnuel: 16000 },
-    "Yaris Cross": { prixNeuf: 25000, depreciationAnn: 0.10, kmMoyenAnnuel: 14000 }
-  },
-  "Ford": {
-    "Fiesta": { prixNeuf: 19000, depreciationAnn: 0.13, kmMoyenAnnuel: 14000 },
-    "Focus":  { prixNeuf: 26000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
-    "Puma":   { prixNeuf: 27000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 }
-  },
-  "Dacia": {
-    "Sandero": { prixNeuf: 13000, depreciationAnn: 0.11, kmMoyenAnnuel: 15000 },
-    "Duster":  { prixNeuf: 18000, depreciationAnn: 0.11, kmMoyenAnnuel: 16000 },
-    "Logan":   { prixNeuf: 11500, depreciationAnn: 0.12, kmMoyenAnnuel: 14000 }
-  },
-  "Audi": {
-    "A1": { prixNeuf: 28000, depreciationAnn: 0.13, kmMoyenAnnuel: 14000 },
-    "A3": { prixNeuf: 37000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
-    "A4": { prixNeuf: 48000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 },
-    "Q3": { prixNeuf: 42000, depreciationAnn: 0.12, kmMoyenAnnuel: 15000 }
-  }
+/* ===== ÉTAT DES FILTRES ===== */
+const F = {
+  carburant: null, boite: null, portes: '5', couleur: null,
+  options: new Set(),
+  premiere: null, carnet: null, garantie: null, accident: null
 };
 
-const ANNEE_COURANTE = 2024;
-const FOURCHETTE     = 0.12; // +/-12%
+const ANNEE_COURANTE = 2026;
+const FOURCHETTE     = 0.12;
+let selectedModele   = null;
+let modeAPI          = false;
 
-/* =====================================================================
-   INITIALISATION DES SELECTS
-   ===================================================================== */
-(function init() {
-  /* Remplir la liste des marques par ordre alphabetique */
+/* ===== MODIFICATEURS ===== */
+const CARB_MOD = {
+  'Essence': 1.000, 'Diesel': 0.940, 'Hybride': 1.060,
+  'PHEV': 1.040, 'Électrique': 0.880, 'GPL': 0.850
+};
+const BOITE_MOD = { 'Manuelle': 1.000, 'Automatique': 1.050, 'Séquentielle': 1.030 };
+const COULEUR_MOD = {
+  'blanc': 1.010, 'noir': 1.020, 'gris': 1.005, 'argent': 1.000,
+  'bleu': 0.975, 'rouge': 0.960, 'vert': 0.930, 'orange': 0.910,
+  'jaune': 0.900, 'beige': 0.950, 'marron': 0.920, 'violet': 0.890
+};
+const OPTION_PRIX = {
+  'gps': 400, 'cuir': 800, 'toit': 700, 'camera': 300, 'chauffants': 350,
+  'parking': 300, 'hiver': 200, 'attelage': 400, 'jantes': 350, 'acc': 400,
+  'lane': 250, 'keyless': 300
+};
+
+/* ===== BASE DE DONNÉES LOCALE (fallback + enrichissement) =====
+   Format : { pN: prix_neuf, dA: dep_ann, kM: km_moy, cat: catégorie, carb: [carburants] }
+*/
+const VEHICULES = {
+"Alfa Romeo": {
+  "Giulia":         {pN:44900,dA:.15,kM:15000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Giulietta":      {pN:28000,dA:.15,kM:14000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Stelvio":        {pN:52000,dA:.14,kM:16000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Tonale":         {pN:42000,dA:.13,kM:15000,cat:'SUV',      carb:['Essence','Hybride','PHEV']}
+},
+"Audi": {
+  "A1":             {pN:28000,dA:.13,kM:14000,cat:'Citadine', carb:['Essence']},
+  "A3":             {pN:37000,dA:.12,kM:15000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "A4":             {pN:48000,dA:.12,kM:15000,cat:'Berline',  carb:['Essence','Diesel']},
+  "A4 Avant":       {pN:51000,dA:.11,kM:15000,cat:'Break',    carb:['Essence','Diesel']},
+  "A5":             {pN:52000,dA:.12,kM:15000,cat:'Coupé',    carb:['Essence','Diesel']},
+  "A6":             {pN:62000,dA:.11,kM:16000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "A6 Avant":       {pN:65000,dA:.11,kM:16000,cat:'Break',    carb:['Diesel','Hybride']},
+  "Q2":             {pN:32000,dA:.13,kM:14000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Q3":             {pN:42000,dA:.12,kM:15000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Q4 e-tron":      {pN:55000,dA:.17,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "Q5":             {pN:58000,dA:.11,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "Q7":             {pN:82000,dA:.12,kM:17000,cat:'SUV',      carb:['Diesel','Hybride']},
+  "TT":             {pN:55000,dA:.14,kM:13000,cat:'Coupé',    carb:['Essence']},
+  "e-tron GT":      {pN:110000,dA:.18,kM:14000,cat:'Berline', carb:['Électrique']}
+},
+"BMW": {
+  "Serie 1":        {pN:35000,dA:.14,kM:15000,cat:'Citadine', carb:['Essence','Diesel']},
+  "Serie 2":        {pN:40000,dA:.13,kM:14000,cat:'Coupé',    carb:['Essence','Diesel']},
+  "Serie 2 Gran Coupé":{pN:38000,dA:.13,kM:14000,cat:'Berline',carb:['Essence','Diesel']},
+  "Serie 3":        {pN:48000,dA:.13,kM:15000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "Serie 3 Touring":{pN:52000,dA:.12,kM:16000,cat:'Break',    carb:['Essence','Diesel','Hybride']},
+  "Serie 4":        {pN:58000,dA:.13,kM:15000,cat:'Coupé',    carb:['Essence','Diesel']},
+  "Serie 5":        {pN:62000,dA:.13,kM:16000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "X1":             {pN:45000,dA:.13,kM:15000,cat:'SUV',      carb:['Essence','Diesel','PHEV']},
+  "X2":             {pN:42000,dA:.13,kM:14000,cat:'SUV',      carb:['Essence','Diesel']},
+  "X3":             {pN:58000,dA:.12,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "X5":             {pN:88000,dA:.13,kM:17000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "iX3":            {pN:70000,dA:.18,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "Z4":             {pN:65000,dA:.14,kM:13000,cat:'Cabriolet',carb:['Essence']}
+},
+"Citroën": {
+  "C1":             {pN:12500,dA:.14,kM:12000,cat:'Citadine', carb:['Essence']},
+  "C3":             {pN:17000,dA:.13,kM:14000,cat:'Citadine', carb:['Essence','Diesel']},
+  "C3 Aircross":    {pN:22000,dA:.13,kM:15000,cat:'SUV',      carb:['Essence','Diesel']},
+  "C4":             {pN:25000,dA:.13,kM:15000,cat:'Berline',  carb:['Essence','Diesel','Électrique']},
+  "C5 Aircross":    {pN:32000,dA:.13,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "C5 X":           {pN:38000,dA:.12,kM:16000,cat:'Berline',  carb:['Hybride','PHEV']},
+  "Berlingo":       {pN:27000,dA:.13,kM:17000,cat:'Monospace',carb:['Essence','Diesel']},
+  "ë-C4":           {pN:38000,dA:.16,kM:13000,cat:'Berline',  carb:['Électrique']}
+},
+"Dacia": {
+  "Sandero":        {pN:13000,dA:.11,kM:15000,cat:'Citadine', carb:['Essence','GPL']},
+  "Duster":         {pN:18000,dA:.11,kM:16000,cat:'SUV',      carb:['Essence','Diesel','GPL']},
+  "Logan":          {pN:11500,dA:.12,kM:14000,cat:'Berline',  carb:['Essence','GPL']},
+  "Spring":         {pN:22000,dA:.15,kM:10000,cat:'Citadine', carb:['Électrique']},
+  "Jogger":         {pN:20000,dA:.11,kM:15000,cat:'Monospace',carb:['Essence','GPL']}
+},
+"Fiat": {
+  "500":            {pN:16000,dA:.14,kM:12000,cat:'Citadine', carb:['Essence']},
+  "500e":           {pN:34000,dA:.17,kM:11000,cat:'Citadine', carb:['Électrique']},
+  "500X":           {pN:25000,dA:.14,kM:14000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Panda":          {pN:13000,dA:.13,kM:13000,cat:'Citadine', carb:['Essence','GPL']},
+  "Tipo":           {pN:20000,dA:.13,kM:15000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Tipo SW":        {pN:22000,dA:.12,kM:15000,cat:'Break',    carb:['Essence','Diesel']}
+},
+"Ford": {
+  "Fiesta":         {pN:19000,dA:.13,kM:14000,cat:'Citadine', carb:['Essence','Diesel']},
+  "Focus":          {pN:26000,dA:.12,kM:15000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Puma":           {pN:27000,dA:.12,kM:15000,cat:'SUV',      carb:['Essence','Hybride']},
+  "Kuga":           {pN:35000,dA:.12,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "Mustang Mach-E": {pN:55000,dA:.17,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "Explorer":       {pN:58000,dA:.14,kM:17000,cat:'SUV',      carb:['PHEV']}
+},
+"Honda": {
+  "Jazz":           {pN:24000,dA:.11,kM:13000,cat:'Citadine', carb:['Hybride']},
+  "Civic":          {pN:32000,dA:.11,kM:15000,cat:'Berline',  carb:['Essence','Hybride']},
+  "HR-V":           {pN:28000,dA:.12,kM:14000,cat:'SUV',      carb:['Hybride']},
+  "CR-V":           {pN:40000,dA:.11,kM:16000,cat:'SUV',      carb:['Essence','Hybride']},
+  "ZR-V":           {pN:38000,dA:.11,kM:15000,cat:'SUV',      carb:['Hybride']},
+  "e":              {pN:36000,dA:.18,kM:11000,cat:'Citadine', carb:['Électrique']}
+},
+"Hyundai": {
+  "i10":            {pN:14000,dA:.13,kM:12000,cat:'Citadine', carb:['Essence']},
+  "i20":            {pN:19000,dA:.12,kM:13000,cat:'Citadine', carb:['Essence']},
+  "i30":            {pN:25000,dA:.12,kM:14000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Tucson":         {pN:35000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "Kona":           {pN:26000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Hybride']},
+  "Kona Electric":  {pN:40000,dA:.16,kM:12000,cat:'SUV',      carb:['Électrique']},
+  "Santa Fe":       {pN:48000,dA:.12,kM:17000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "IONIQ 5":        {pN:48000,dA:.16,kM:13000,cat:'SUV',      carb:['Électrique']},
+  "IONIQ 6":        {pN:52000,dA:.16,kM:13000,cat:'Berline',  carb:['Électrique']}
+},
+"Jeep": {
+  "Renegade":       {pN:26000,dA:.13,kM:14000,cat:'SUV',      carb:['Essence','Diesel','PHEV']},
+  "Compass":        {pN:32000,dA:.13,kM:15000,cat:'SUV',      carb:['Essence','Diesel','PHEV']},
+  "Avenger":        {pN:29000,dA:.13,kM:14000,cat:'SUV',      carb:['Essence','Électrique']},
+  "Cherokee":       {pN:42000,dA:.13,kM:16000,cat:'SUV',      carb:['Diesel']}
+},
+"Kia": {
+  "Picanto":        {pN:14000,dA:.13,kM:11000,cat:'Citadine', carb:['Essence']},
+  "Rio":            {pN:18000,dA:.12,kM:13000,cat:'Citadine', carb:['Essence']},
+  "Ceed":           {pN:26000,dA:.12,kM:14000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Sportage":       {pN:34000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "Sorento":        {pN:48000,dA:.11,kM:17000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "Niro":           {pN:32000,dA:.12,kM:14000,cat:'SUV',      carb:['Hybride','PHEV','Électrique']},
+  "EV6":            {pN:52000,dA:.16,kM:13000,cat:'SUV',      carb:['Électrique']},
+  "EV9":            {pN:78000,dA:.16,kM:14000,cat:'SUV',      carb:['Électrique']}
+},
+"Land Rover": {
+  "Discovery Sport":{pN:52000,dA:.14,kM:16000,cat:'SUV',      carb:['Diesel','PHEV']},
+  "Range Rover Evoque":{pN:55000,dA:.14,kM:15000,cat:'SUV',   carb:['Diesel','PHEV']},
+  "Range Rover Sport":{pN:95000,dA:.14,kM:17000,cat:'SUV',    carb:['Diesel','Hybride','PHEV']},
+  "Defender":       {pN:75000,dA:.14,kM:17000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']}
+},
+"Mazda": {
+  "2":              {pN:17000,dA:.12,kM:13000,cat:'Citadine', carb:['Essence']},
+  "3":              {pN:26000,dA:.11,kM:14000,cat:'Berline',  carb:['Essence','Hybride']},
+  "6":              {pN:35000,dA:.11,kM:15000,cat:'Berline',  carb:['Essence','Diesel']},
+  "CX-30":          {pN:28000,dA:.11,kM:14000,cat:'SUV',      carb:['Essence','Hybride']},
+  "CX-5":           {pN:35000,dA:.10,kM:15000,cat:'SUV',      carb:['Essence','Diesel']},
+  "CX-60":          {pN:44000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Diesel','PHEV']},
+  "MX-5":           {pN:33000,dA:.11,kM:12000,cat:'Cabriolet',carb:['Essence']}
+},
+"Mercedes": {
+  "Classe A":       {pN:38000,dA:.13,kM:15000,cat:'Citadine', carb:['Essence','Diesel']},
+  "Classe B":       {pN:35000,dA:.12,kM:14000,cat:'Monospace',carb:['Essence','Diesel']},
+  "Classe C":       {pN:52000,dA:.12,kM:15000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "Classe C Break": {pN:55000,dA:.11,kM:15000,cat:'Break',    carb:['Essence','Diesel','Hybride']},
+  "Classe E":       {pN:68000,dA:.12,kM:16000,cat:'Berline',  carb:['Diesel','Hybride','PHEV']},
+  "GLA":            {pN:44000,dA:.13,kM:15000,cat:'SUV',      carb:['Essence','Diesel']},
+  "GLB":            {pN:48000,dA:.12,kM:15000,cat:'SUV',      carb:['Essence','Diesel']},
+  "GLC":            {pN:62000,dA:.12,kM:16000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "GLE":            {pN:88000,dA:.13,kM:17000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "EQA":            {pN:52000,dA:.17,kM:13000,cat:'SUV',      carb:['Électrique']},
+  "EQB":            {pN:58000,dA:.17,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "EQC":            {pN:78000,dA:.18,kM:14000,cat:'SUV',      carb:['Électrique']}
+},
+"Mini": {
+  "Cooper":         {pN:28000,dA:.14,kM:13000,cat:'Citadine', carb:['Essence','Diesel']},
+  "Cooper Electric":{pN:38000,dA:.17,kM:11000,cat:'Citadine', carb:['Électrique']},
+  "Clubman":        {pN:38000,dA:.13,kM:13000,cat:'Break',    carb:['Essence','Diesel']},
+  "Countryman":     {pN:38000,dA:.13,kM:14000,cat:'SUV',      carb:['Essence','Diesel','PHEV']},
+  "Cabrio":         {pN:35000,dA:.14,kM:12000,cat:'Cabriolet',carb:['Essence']}
+},
+"Mitsubishi": {
+  "ASX":            {pN:24000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence']},
+  "Eclipse Cross":  {pN:32000,dA:.12,kM:15000,cat:'SUV',      carb:['Essence','PHEV']},
+  "Outlander":      {pN:38000,dA:.12,kM:16000,cat:'SUV',      carb:['Diesel','PHEV']}
+},
+"Nissan": {
+  "Micra":          {pN:16000,dA:.13,kM:12000,cat:'Citadine', carb:['Essence']},
+  "Juke":           {pN:24000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Hybride']},
+  "Qashqai":        {pN:32000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Hybride']},
+  "X-Trail":        {pN:42000,dA:.11,kM:16000,cat:'SUV',      carb:['Essence','Hybride']},
+  "Leaf":           {pN:34000,dA:.18,kM:12000,cat:'Citadine', carb:['Électrique']},
+  "Ariya":          {pN:55000,dA:.17,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "Townstar":       {pN:26000,dA:.12,kM:16000,cat:'Monospace',carb:['Essence','Électrique']}
+},
+"Opel": {
+  "Corsa":          {pN:18000,dA:.12,kM:13000,cat:'Citadine', carb:['Essence','Diesel','Électrique']},
+  "Mokka":          {pN:25000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Diesel','Électrique']},
+  "Astra":          {pN:26000,dA:.12,kM:14000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "Astra Sports Tourer":{pN:28000,dA:.11,kM:15000,cat:'Break',carb:['Essence','Diesel','Hybride','PHEV']},
+  "Crossland":      {pN:22000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Grandland":      {pN:35000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "Zafira Life":    {pN:38000,dA:.11,kM:17000,cat:'Monospace',carb:['Diesel']}
+},
+"Peugeot": {
+  "108":            {pN:13000,dA:.14,kM:11000,cat:'Citadine', carb:['Essence']},
+  "208":            {pN:20000,dA:.13,kM:15000,cat:'Citadine', carb:['Essence','Diesel','Électrique']},
+  "2008":           {pN:25000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Diesel','Électrique']},
+  "308":            {pN:26000,dA:.12,kM:15000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "3008":           {pN:34000,dA:.13,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "408":            {pN:40000,dA:.12,kM:15000,cat:'Berline',  carb:['Hybride','PHEV']},
+  "5008":           {pN:38000,dA:.12,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Hybride']},
+  "508":            {pN:45000,dA:.11,kM:16000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "Rifter":         {pN:28000,dA:.12,kM:16000,cat:'Monospace',carb:['Essence','Diesel']}
+},
+"Porsche": {
+  "911":            {pN:130000,dA:.10,kM:13000,cat:'Coupé',   carb:['Essence']},
+  "718 Cayman":     {pN:68000,dA:.12,kM:12000,cat:'Coupé',    carb:['Essence']},
+  "718 Boxster":    {pN:68000,dA:.12,kM:12000,cat:'Cabriolet',carb:['Essence']},
+  "Macan":          {pN:75000,dA:.13,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Électrique']},
+  "Cayenne":        {pN:95000,dA:.12,kM:17000,cat:'SUV',      carb:['Essence','Hybride','PHEV']},
+  "Panamera":       {pN:110000,dA:.13,kM:16000,cat:'Berline', carb:['Essence','Hybride','PHEV']},
+  "Taycan":         {pN:110000,dA:.17,kM:14000,cat:'Berline', carb:['Électrique']}
+},
+"Renault": {
+  "Twingo":         {pN:15000,dA:.14,kM:12000,cat:'Citadine', carb:['Essence']},
+  "Clio":           {pN:18500,dA:.13,kM:15000,cat:'Citadine', carb:['Essence','Hybride','GPL']},
+  "Captur":         {pN:22500,dA:.13,kM:15000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "Megane":         {pN:23000,dA:.12,kM:15000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Megane E-Tech":  {pN:40000,dA:.15,kM:14000,cat:'Berline',  carb:['Hybride','PHEV']},
+  "Kadjar":         {pN:28000,dA:.14,kM:16000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Koleos":         {pN:36000,dA:.12,kM:16000,cat:'SUV',      carb:['Diesel']},
+  "Arkana":         {pN:29900,dA:.13,kM:15000,cat:'SUV',      carb:['Essence','Hybride']},
+  "Austral":        {pN:35000,dA:.12,kM:15000,cat:'SUV',      carb:['Hybride','PHEV']},
+  "Scenic":         {pN:32000,dA:.13,kM:15000,cat:'Monospace',carb:['Hybride','Électrique']},
+  "Zoe":            {pN:32000,dA:.16,kM:12000,cat:'Citadine', carb:['Électrique']}
+},
+"Seat": {
+  "Mii":            {pN:12000,dA:.13,kM:11000,cat:'Citadine', carb:['Essence']},
+  "Ibiza":          {pN:20000,dA:.12,kM:13000,cat:'Citadine', carb:['Essence','Diesel']},
+  "Arona":          {pN:22000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Leon":           {pN:25000,dA:.11,kM:14000,cat:'Berline',  carb:['Essence','Diesel','Hybride','PHEV']},
+  "Leon Sportstourer":{pN:27000,dA:.11,kM:15000,cat:'Break',  carb:['Essence','Diesel','Hybride']},
+  "Ateca":          {pN:30000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Tarraco":        {pN:35000,dA:.11,kM:16000,cat:'SUV',      carb:['Essence','Diesel','PHEV']}
+},
+"Skoda": {
+  "Fabia":          {pN:18000,dA:.12,kM:13000,cat:'Citadine', carb:['Essence']},
+  "Scala":          {pN:24000,dA:.11,kM:14000,cat:'Berline',  carb:['Essence']},
+  "Kamiq":          {pN:24000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Octavia":        {pN:30000,dA:.10,kM:15000,cat:'Berline',  carb:['Essence','Diesel','Hybride']},
+  "Octavia Combi":  {pN:32000,dA:.10,kM:16000,cat:'Break',    carb:['Essence','Diesel','Hybride']},
+  "Karoq":          {pN:30000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Kodiaq":         {pN:40000,dA:.11,kM:16000,cat:'SUV',      carb:['Essence','Diesel']},
+  "Superb":         {pN:42000,dA:.10,kM:16000,cat:'Berline',  carb:['Essence','Diesel']},
+  "Enyaq":          {pN:50000,dA:.16,kM:14000,cat:'SUV',      carb:['Électrique']}
+},
+"Suzuki": {
+  "Ignis":          {pN:17000,dA:.12,kM:12000,cat:'Citadine', carb:['Essence','Hybride']},
+  "Swift":          {pN:18000,dA:.12,kM:12000,cat:'Citadine', carb:['Essence','Hybride']},
+  "Jimny":          {pN:22000,dA:.09,kM:14000,cat:'SUV',      carb:['Essence']},
+  "Vitara":         {pN:26000,dA:.11,kM:14000,cat:'SUV',      carb:['Hybride']},
+  "S-Cross":        {pN:25000,dA:.11,kM:14000,cat:'SUV',      carb:['Hybride']}
+},
+"Tesla": {
+  "Model 3":        {pN:52000,dA:.18,kM:15000,cat:'Berline',  carb:['Électrique']},
+  "Model Y":        {pN:58000,dA:.18,kM:15000,cat:'SUV',      carb:['Électrique']},
+  "Model S":        {pN:110000,dA:.17,kM:15000,cat:'Berline', carb:['Électrique']},
+  "Model X":        {pN:115000,dA:.18,kM:15000,cat:'SUV',     carb:['Électrique']}
+},
+"Toyota": {
+  "Aygo X":         {pN:17000,dA:.12,kM:11000,cat:'Citadine', carb:['Essence']},
+  "Yaris":          {pN:20000,dA:.10,kM:13000,cat:'Citadine', carb:['Hybride']},
+  "Yaris Cross":    {pN:25000,dA:.10,kM:14000,cat:'SUV',      carb:['Hybride']},
+  "C-HR":           {pN:28000,dA:.11,kM:14000,cat:'SUV',      carb:['Hybride','PHEV']},
+  "Corolla":        {pN:27000,dA:.10,kM:15000,cat:'Berline',  carb:['Hybride']},
+  "Corolla Touring":{pN:30000,dA:.10,kM:15000,cat:'Break',    carb:['Hybride']},
+  "RAV4":           {pN:38000,dA:.11,kM:16000,cat:'SUV',      carb:['Hybride','PHEV']},
+  "GR86":           {pN:35000,dA:.12,kM:13000,cat:'Coupé',    carb:['Essence']},
+  "Land Cruiser":   {pN:75000,dA:.10,kM:18000,cat:'SUV',      carb:['Diesel']},
+  "bZ4X":           {pN:52000,dA:.17,kM:14000,cat:'SUV',      carb:['Électrique']}
+},
+"Volkswagen": {
+  "Up":             {pN:13000,dA:.13,kM:11000,cat:'Citadine', carb:['Essence']},
+  "Polo":           {pN:22000,dA:.11,kM:14000,cat:'Citadine', carb:['Essence']},
+  "Golf":           {pN:30000,dA:.10,kM:15000,cat:'Berline',  carb:['Essence','Diesel','Hybride']},
+  "Golf SW":        {pN:33000,dA:.10,kM:16000,cat:'Break',    carb:['Essence','Diesel','Hybride']},
+  "T-Cross":        {pN:26000,dA:.11,kM:14000,cat:'SUV',      carb:['Essence']},
+  "T-Roc":          {pN:32000,dA:.11,kM:15000,cat:'SUV',      carb:['Essence','Diesel','Hybride']},
+  "Tiguan":         {pN:38000,dA:.11,kM:16000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV']},
+  "Touareg":        {pN:72000,dA:.11,kM:17000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "Passat":         {pN:42000,dA:.10,kM:17000,cat:'Berline',  carb:['Diesel','Hybride']},
+  "Arteon":         {pN:55000,dA:.11,kM:16000,cat:'Berline',  carb:['Essence','Diesel','Hybride']},
+  "ID.3":           {pN:40000,dA:.17,kM:14000,cat:'Citadine', carb:['Électrique']},
+  "ID.4":           {pN:48000,dA:.17,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "ID.5":           {pN:52000,dA:.17,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "ID.7":           {pN:62000,dA:.17,kM:15000,cat:'Berline',  carb:['Électrique']}
+},
+"Volvo": {
+  "XC40":           {pN:42000,dA:.12,kM:14000,cat:'SUV',      carb:['Essence','Diesel','Hybride','PHEV','Électrique']},
+  "XC60":           {pN:58000,dA:.11,kM:15000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "XC90":           {pN:75000,dA:.11,kM:17000,cat:'SUV',      carb:['Diesel','Hybride','PHEV']},
+  "V60":            {pN:45000,dA:.11,kM:15000,cat:'Break',    carb:['Diesel','Hybride','PHEV']},
+  "C40":            {pN:52000,dA:.16,kM:14000,cat:'SUV',      carb:['Électrique']},
+  "EX30":           {pN:42000,dA:.17,kM:13000,cat:'SUV',      carb:['Électrique']}
+}
+};
+
+/* ===== INITIALISATION ===== */
+async function init() {
   const selMarque = document.getElementById('sel-marque');
-  Object.keys(VEHICULES).sort().forEach(marque => {
-    const opt = document.createElement('option');
-    opt.value = marque;
-    opt.textContent = marque;
-    selMarque.appendChild(opt);
-  });
 
-  /* Remplir les annees de 2024 a 2000 */
+  try {
+    const res = await fetch('/api/marques');
+    if (!res.ok) throw new Error();
+    const marques = await res.json();
+    if (!Array.isArray(marques) || marques.length === 0) throw new Error();
+
+    modeAPI = true;
+    marques.sort((a,b) => a.nom.localeCompare(b.nom)).forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id; opt.dataset.nom = m.nom; opt.textContent = m.nom;
+      selMarque.appendChild(opt);
+    });
+
+    // Marques FALLBACK non présentes en DB
+    Object.keys(VEHICULES).sort().forEach(marque => {
+      const exists = [...selMarque.options].some(o => o.dataset.nom === marque);
+      if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = 'local_' + marque; opt.dataset.nom = marque; opt.dataset.local = '1';
+        opt.textContent = marque + ' ★';
+        selMarque.appendChild(opt);
+      }
+    });
+  } catch {
+    modeAPI = false;
+    Object.keys(VEHICULES).sort().forEach(marque => {
+      const opt = document.createElement('option');
+      opt.value = marque; opt.textContent = marque;
+      selMarque.appendChild(opt);
+    });
+  }
+
   const selAnnee = document.getElementById('sel-annee');
-  for (let a = ANNEE_COURANTE; a >= 2000; a--) {
+  for (let a = ANNEE_COURANTE; a >= 1995; a--) {
     const opt = document.createElement('option');
-    opt.value = a;
-    opt.textContent = a;
+    opt.value = a; opt.textContent = a;
     selAnnee.appendChild(opt);
   }
-})();
+}
 
-/* =====================================================================
-   EVENEMENT : changement de marque
-   ===================================================================== */
-function onMarqueChange() {
-  const marque   = document.getElementById('sel-marque').value;
-  const selModel = document.getElementById('sel-modele');
-  const selAnnee = document.getElementById('sel-annee');
-  const inpKm    = document.getElementById('inp-km');
+/* ===== CHANGEMENT MARQUE ===== */
+async function onMarqueChange() {
+  const selMarque = document.getElementById('sel-marque');
+  const selModel  = document.getElementById('sel-modele');
 
-  /* Reinitialiser les champs suivants */
-  selModel.innerHTML = '<option value="">Selectionner un modele</option>';
-  selAnnee.value = '';
-  inpKm.value   = '';
+  selModel.innerHTML = '<option value="">Sélectionner un modèle</option>';
+  selModel.disabled = true;
+  selectedModele = null;
+  document.getElementById('sec-motorisation').classList.remove('visible');
+  document.getElementById('sec-annee-km').classList.remove('visible');
+  document.getElementById('btn-avance').style.display = 'none';
 
-  if (!marque) {
-    selModel.disabled = true;
-    selAnnee.disabled = true;
-    inpKm.disabled    = true;
-    return;
+  const val = selMarque.value;
+  if (!val) return;
+
+  const opt = selMarque.options[selMarque.selectedIndex];
+  const isLocal = opt.dataset.local === '1';
+  const marqueNom = opt.dataset.nom || val;
+
+  if (modeAPI && !isLocal) {
+    try {
+      const res = await fetch('/api/modeles?marque_id=' + val);
+      const items = await res.json();
+      items.sort((a,b) => a.nom.localeCompare(b.nom)).forEach(m => {
+        const o = document.createElement('option');
+        o.value = m.id;
+        const carbs = m.carburants ? m.carburants.split(',') : (VEHICULES[marqueNom]?.[m.nom]?.carb || ['Essence']);
+        o.dataset.info = JSON.stringify({
+          id: m.id, nom: m.nom, marqueNom,
+          prixNeuf: m.prix_neuf,
+          depreciationAnn: parseFloat(m.depreciation_ann),
+          kmMoyenAnnuel: m.km_moyen_annuel,
+          carburants: carbs,
+          cat: m.categorie || ''
+        });
+        o.textContent = m.nom;
+        selModel.appendChild(o);
+      });
+    } catch(e) { console.error(e); }
+  } else {
+    const modeles = VEHICULES[marqueNom] || {};
+    Object.keys(modeles).sort().forEach(nom => {
+      const d = modeles[nom];
+      const o = document.createElement('option');
+      o.value = nom;
+      o.dataset.info = JSON.stringify({
+        id: null, nom, marqueNom,
+        prixNeuf: d.pN, depreciationAnn: d.dA, kmMoyenAnnuel: d.kM,
+        carburants: d.carb, cat: d.cat
+      });
+      o.textContent = nom;
+      selModel.appendChild(o);
+    });
   }
-
-  /* Remplir les modeles de la marque selectionnee */
-  Object.keys(VEHICULES[marque]).sort().forEach(modele => {
-    const opt = document.createElement('option');
-    opt.value = modele;
-    opt.textContent = modele;
-    selModel.appendChild(opt);
-  });
 
   selModel.disabled = false;
-  selAnnee.disabled = true;
-  inpKm.disabled    = true;
 }
 
-/* =====================================================================
-   EVENEMENT : changement de modele
-   ===================================================================== */
+/* ===== CHANGEMENT MODÈLE ===== */
 function onModeleChange() {
-  const modele   = document.getElementById('sel-modele').value;
-  const selAnnee = document.getElementById('sel-annee');
-  const inpKm    = document.getElementById('inp-km');
+  const selModel = document.getElementById('sel-modele');
+  const opt = selModel.options[selModel.selectedIndex];
 
-  if (!modele) {
-    selAnnee.disabled = true;
-    inpKm.disabled    = true;
-    return;
-  }
+  if (!opt || !opt.dataset.info) { selectedModele = null; return; }
 
-  selAnnee.disabled = false;
-  inpKm.disabled    = false;
+  selectedModele = JSON.parse(opt.dataset.info);
+  F.carburant = null; F.boite = null;
+
+  // Remplir les chips carburant
+  const container = document.getElementById('chips-carb');
+  container.innerHTML = '';
+  const carbs = selectedModele.carburants || ['Essence'];
+  const icons = {
+    'Essence':'⛽','Diesel':'🔩','Hybride':'♻️','PHEV':'🔌⛽',
+    'Électrique':'🔋','GPL':'🌿'
+  };
+  carbs.forEach(c => {
+    const span = document.createElement('span');
+    span.className = 'chip';
+    span.dataset.group = 'carburant';
+    span.dataset.val   = c;
+    span.textContent   = (icons[c] || '') + ' ' + c;
+    span.onclick = () => selectChip(span);
+    container.appendChild(span);
+    if (carbs.length === 1) { span.classList.add('active'); F.carburant = c; }
+  });
+
+  document.getElementById('sec-motorisation').classList.add('visible');
+  document.getElementById('sec-annee-km').classList.add('visible');
+  document.getElementById('btn-avance').style.display = 'block';
+  updateAdvCount();
 }
 
-/* =====================================================================
-   ALGORITHME PRINCIPAL DE CALCUL DE PRIX
-   - Prix de base via depreciation exponentielle
-   - Ajustement kilometrage : -0.8% par tranche de 10 000 km au-dessus,
-     +0.5% par tranche en dessous de la moyenne
-   - Fourchette : prix moyen +/-12%
-   ===================================================================== */
-function calculerPrix(modeleData, annee, km) {
-  const age = ANNEE_COURANTE - annee;
+/* ===== CHIP SÉLECTION ===== */
+function selectChip(el) {
+  const group = el.dataset.group;
+  document.querySelectorAll(`.chip[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  F[group] = el.dataset.val;
+  updateAdvCount();
+}
 
-  /* Prix de base apres depreciation annuelle composee */
-  const prixBase = modeleData.prixNeuf * Math.pow(1 - modeleData.depreciationAnn, age);
+/* ===== COULEUR ===== */
+function selectCouleur(el) {
+  document.querySelectorAll('.color-swatch-wrap').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  F.couleur = el.dataset.couleur;
+  updateAdvCount();
+}
 
-  /* Kilometrage attendu sur la duree de vie du vehicule */
-  const kmAttendu = modeleData.kmMoyenAnnuel * age;
+/* ===== OPTIONS ===== */
+function toggleOption(el) {
+  const opt = el.dataset.opt;
+  el.classList.toggle('checked');
+  if (el.classList.contains('checked')) F.options.add(opt);
+  else F.options.delete(opt);
+  updateAdvCount();
+}
 
-  /* Ecart exprime en tranches de 10 000 km */
-  const ecartTranches = (km - kmAttendu) / 10000;
+/* ===== TOGGLES HISTORIQUE ===== */
+function selectToggle(el) {
+  const tog = el.dataset.tog;
+  document.querySelectorAll(`.toggle-btn[data-tog="${tog}"]`).forEach(b => {
+    b.classList.remove('oui','non');
+  });
+  el.classList.add(el.dataset.val === 'non' ? 'non' : (el.dataset.val === 'grave' ? 'non' : 'oui'));
+  F[tog] = el.dataset.val;
+  updateAdvCount();
+}
 
-  /* Coefficient d'ajustement kilometrique */
-  let coefKm;
-  if (ecartTranches > 0) {
-    coefKm = 1 - 0.008 * ecartTranches;  // -0.8% par tranche au-dessus
-  } else {
-    coefKm = 1 - 0.005 * ecartTranches;  // +0.5% par tranche en dessous
-  }
+/* ===== CV SLIDER ===== */
+function updateCV(el) {
+  document.getElementById('cv-val').textContent = el.value + ' CV';
+}
 
-  /* Securite : coef entre 40% et 130% du prix de base */
-  coefKm = Math.max(0.4, Math.min(1.3, coefKm));
+/* ===== TOGGLE SECTION AVANCÉE ===== */
+let avanceOuvert = false;
+function toggleAvance() {
+  avanceOuvert = !avanceOuvert;
+  document.getElementById('sec-avance').style.display = avanceOuvert ? 'block' : 'none';
+  document.getElementById('adv-arrow').textContent = avanceOuvert ? '▲' : '▼';
+}
 
-  const prixMoyen = Math.round(prixBase * coefKm);
+function updateAdvCount() {
+  let n = 0;
+  if (F.couleur) n++;
+  if (F.options.size > 0) n += F.options.size;
+  if (F.premiere) n++;
+  if (F.carnet)   n++;
+  if (F.garantie) n++;
+  if (F.accident) n++;
+  const badge = document.getElementById('adv-count');
+  if (n > 0) { badge.textContent = n; badge.style.display = 'inline'; }
+  else badge.style.display = 'none';
+}
+
+/* ===== ALGORITHME ===== */
+function calculerPrix(m, annee, km) {
+  const age      = ANNEE_COURANTE - annee;
+  const prixBase = m.prixNeuf * Math.pow(1 - m.depreciationAnn, Math.max(0, age));
+  const kmAttendu = m.kmMoyenAnnuel * Math.max(0, age);
+  const ecart    = (km - kmAttendu) / 10000;
+  let   coefKm   = ecart > 0 ? 1 - 0.008 * ecart : 1 - 0.005 * ecart;
+  coefKm         = Math.max(0.4, Math.min(1.3, coefKm));
+
+  const prixApresKm   = Math.round(prixBase * coefKm);
+  const modCarb       = CARB_MOD[F.carburant]   || 1.0;
+  const modBoite      = BOITE_MOD[F.boite]      || 1.0;
+  const modCouleur    = COULEUR_MOD[F.couleur]  || 1.0;
+
+  let optionsTotal = 0;
+  F.options.forEach(o => { optionsTotal += (OPTION_PRIX[o] || 0); });
+
+  let modHistorique = 1.0;
+  if (F.premiere === 'oui') modHistorique *= 1.06;
+  if (F.carnet   === 'oui') modHistorique *= 1.03;
+  if (F.garantie === 'oui') modHistorique *= 1.04;
+  if (F.accident === 'leger') modHistorique *= 0.92;
+  if (F.accident === 'grave') modHistorique *= 0.80;
+
+  const apresCarb    = Math.round(prixApresKm  * modCarb);
+  const apresBoite   = Math.round(apresCarb    * modBoite);
+  const apresCouleur = Math.round(apresBoite   * modCouleur);
+  const apresOptions = apresCouleur + optionsTotal;
+  const prixMoyen    = Math.round(apresOptions * modHistorique);
 
   return {
-    moyen: prixMoyen,
-    haut:  Math.round(prixMoyen * (1 + FOURCHETTE)),
-    bas:   Math.round(prixMoyen * (1 - FOURCHETTE))
+    base:         Math.round(prixBase),
+    apresKm:      prixApresKm,
+    kmDiff:       prixApresKm - Math.round(prixBase),
+    modCarb, modBoite, modCouleur,
+    optionsTotal, modHistorique,
+    moyen:  prixMoyen,
+    haut:   Math.round(prixMoyen * (1 + FOURCHETTE)),
+    bas:    Math.round(prixMoyen * (1 - FOURCHETTE))
   };
 }
 
-/* =====================================================================
-   ETAT GENERAL DU VEHICULE
-   Score combine age et kilometrage pour obtenir un label
-   ===================================================================== */
 function determinerEtat(age, km) {
   const score = age * 1.2 + km / 20000;
-
-  if (score < 3)  return { label: 'Excellent', classe: 'badge-excellent' };
-  if (score < 7)  return { label: 'Bon',       classe: 'badge-bon'       };
-  if (score < 12) return { label: 'Correct',   classe: 'badge-correct'   };
-  return              { label: 'Fatigue',   classe: 'badge-fatigue'   };
+  if (score < 3)  return {label:'Excellent',classe:'badge-excellent'};
+  if (score < 7)  return {label:'Bon',      classe:'badge-bon'};
+  if (score < 12) return {label:'Correct',  classe:'badge-correct'};
+  return               {label:'Fatigué', classe:'badge-fatigue'};
 }
 
-/* =====================================================================
-   ANIMATION COMPTEUR (easing ease-out cubic)
-   ===================================================================== */
-function animerCompteur(element, cible, duree) {
-  duree = duree || 900;
+function animerCompteur(el, cible, duree) {
   const debut = Date.now();
-
-  function update() {
-    const elapsed  = Date.now() - debut;
-    const progress = Math.min(elapsed / duree, 1);
-    const eased    = 1 - Math.pow(1 - progress, 3);
-    const valeur   = Math.round(cible * eased);
-    element.textContent = formatPrix(valeur);
-    if (progress < 1) requestAnimationFrame(update);
-  }
-
-  requestAnimationFrame(update);
+  (function update() {
+    const p = Math.min((Date.now()-debut)/duree, 1);
+    el.textContent = formatPrix(Math.round(cible * (1 - Math.pow(1-p, 3))));
+    if (p < 1) requestAnimationFrame(update);
+  })();
 }
 
-/* Formater un nombre en euros (locale francaise) */
 function formatPrix(n) {
-  return n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  return n.toLocaleString('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0});
 }
 
-/* =====================================================================
-   GRAPHIQUE DE DEPRECIATION SUR 15 ANS (Chart.js)
-   Un point marque l'annee actuelle du vehicule estime
-   ===================================================================== */
-let chartInstance = null;
+/* ===== BREAKDOWN ===== */
+function afficherBreakdown(res, m, annee, km) {
+  const age = ANNEE_COURANTE - annee;
+  const pct = v => v >= 0 ? '+' + v.toFixed(0) + '%' : v.toFixed(0) + '%';
+  const eur = v => v >= 0 ? '+' + formatPrix(v) : '−' + formatPrix(Math.abs(v));
 
-function tracerGraphique(modeleData, marque, modele, anneeVehicule) {
-  const labels  = [];
-  const valeurs = [];
-  const anneeMax = anneeVehicule + 15;
+  const rows = [
+    ['Prix neuf', formatPrix(m.prixNeuf), 'neutral'],
+    [`Dépréciation ${age} an${age>1?'s':''} (${(m.depreciationAnn*100).toFixed(0)}%/an)`,
+      eur(res.base - m.prixNeuf), res.base < m.prixNeuf ? 'minus' : 'plus'],
+    [`Kilométrage (${km.toLocaleString('fr-FR')} km)`,
+      eur(res.kmDiff), res.kmDiff >= 0 ? 'plus' : 'minus'],
+  ];
 
-  /* Calcul de la valeur pour chaque annee depuis l'achat neuf */
-  for (let a = anneeVehicule; a <= anneeMax; a++) {
-    const ageLoop = a - anneeVehicule;
-    const prix    = modeleData.prixNeuf * Math.pow(1 - modeleData.depreciationAnn, ageLoop);
-    labels.push(a);
-    valeurs.push(Math.round(Math.max(prix, modeleData.prixNeuf * 0.05)));
+  if (F.carburant && res.modCarb !== 1.0) {
+    const diff = res.apresKm * res.modCarb - res.apresKm;
+    rows.push([`Carburant : ${F.carburant}`, eur(diff), diff >= 0 ? 'plus' : 'minus']);
   }
+  if (F.boite && res.modBoite !== 1.0) {
+    const base = res.apresKm * res.modCarb;
+    const diff = base * res.modBoite - base;
+    rows.push([`Boîte : ${F.boite}`, eur(diff), diff >= 0 ? 'plus' : 'minus']);
+  }
+  if (F.couleur && res.modCouleur !== 1.0) {
+    const base2 = res.apresKm * res.modCarb * res.modBoite;
+    const diff2 = base2 * res.modCouleur - base2;
+    rows.push([`Couleur : ${F.couleur}`, eur(diff2), diff2 >= 0 ? 'plus' : 'minus']);
+  }
+  if (res.optionsTotal > 0) rows.push([`Options (${F.options.size} sélectionnées)`, eur(res.optionsTotal), 'plus']);
+  if (res.modHistorique !== 1.0) {
+    const baseFinal = res.moyen / res.modHistorique;
+    const diffH = res.moyen - baseFinal;
+    rows.push([`Historique du véhicule`, eur(Math.round(diffH)), diffH >= 0 ? 'plus' : 'minus']);
+  }
+  rows.push(['Prix moyen estimé', formatPrix(res.moyen), 'total']);
 
-  document.getElementById('chart-title-model').textContent = marque + ' ' + modele;
+  const container = document.getElementById('breakdown-rows');
+  container.innerHTML = rows.map((r,i) =>
+    `<div class="breakdown-row">
+      <span class="br-label">${r[0]}</span>
+      <span class="br-val ${i === rows.length-1 ? 'br-total' : 'br-' + r[2]}">${r[1]}</span>
+    </div>`
+  ).join('');
+}
 
-  /* Indice correspondant a l'annee courante dans la serie */
-  const idxActuel = Math.min(ANNEE_COURANTE - anneeVehicule, labels.length - 1);
-
-  /* Detruire l'ancien graphique si existant */
+/* ===== GRAPHIQUE ===== */
+let chartInstance = null;
+function tracerGraphique(m, anneeVehicule) {
+  const labels = [], valeurs = [];
+  for (let a = anneeVehicule; a <= anneeVehicule+15; a++) {
+    labels.push(a);
+    valeurs.push(Math.round(Math.max(m.prixNeuf * Math.pow(1-m.depreciationAnn, a-anneeVehicule), m.prixNeuf*.05)));
+  }
+  document.getElementById('chart-title-model').textContent = m.marqueNom + ' ' + m.nom;
+  const idx = Math.min(ANNEE_COURANTE - anneeVehicule, labels.length-1);
   if (chartInstance) chartInstance.destroy();
-
-  const ctx      = document.getElementById('chartDeprec').getContext('2d');
-  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
-  gradient.addColorStop(0, 'rgba(230, 57, 70, 0.35)');
-  gradient.addColorStop(1, 'rgba(230, 57, 70, 0.01)');
-
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Valeur estimee',
-        data: valeurs,
-        borderColor: '#e63946',
-        backgroundColor: gradient,
-        borderWidth: 2.5,
-        /* Le point de l'annee actuelle est mis en evidence */
-        pointRadius: labels.map(function(_, i) { return i === idxActuel ? 8 : 3; }),
-        pointBackgroundColor: labels.map(function(_, i) { return i === idxActuel ? '#fff' : '#e63946'; }),
-        pointBorderColor: '#e63946',
-        pointBorderWidth: labels.map(function(_, i) { return i === idxActuel ? 3 : 1.5; }),
-        tension: 0.4,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a1a1a',
-          borderColor: '#2e2e2e',
-          borderWidth: 1,
-          titleColor: '#f0f0f0',
-          bodyColor: '#aaa',
-          callbacks: {
-            label: function(ctx) { return ' ' + formatPrix(ctx.parsed.y); }
-          }
+  const ctx = document.getElementById('chartDeprec').getContext('2d');
+  const gradient = ctx.createLinearGradient(0,0,0,280);
+  gradient.addColorStop(0,'rgba(230,57,70,.35)');
+  gradient.addColorStop(1,'rgba(230,57,70,.01)');
+  chartInstance = new Chart(ctx,{
+    type:'line',
+    data:{ labels, datasets:[{
+      label:'Valeur estimée', data:valeurs,
+      borderColor:'#e63946', backgroundColor:gradient, borderWidth:2.5,
+      pointRadius: labels.map((_,i)=>i===idx?8:3),
+      pointBackgroundColor: labels.map((_,i)=>i===idx?'#fff':'#e63946'),
+      pointBorderColor:'#e63946',
+      pointBorderWidth: labels.map((_,i)=>i===idx?3:1.5),
+      tension:.4, fill:true
+    }]},
+    options:{
+      responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#1a1a1a',borderColor:'#2e2e2e',borderWidth:1,
+          titleColor:'#f0f0f0',bodyColor:'#aaa',
+          callbacks:{label:c=>' '+formatPrix(c.parsed.y)}
         }
       },
-      scales: {
-        x: {
-          grid: { color: '#1f1f1f' },
-          ticks: { color: '#888', font: { family: 'Inter', size: 11 } }
-        },
-        y: {
-          grid: { color: '#1f1f1f' },
-          ticks: {
-            color: '#888',
-            font: { family: 'Inter', size: 11 },
-            callback: function(v) { return formatPrix(v); }
-          },
-          beginAtZero: false
-        }
+      scales:{
+        x:{grid:{color:'#1f1f1f'},ticks:{color:'#888',font:{family:'Inter',size:11}}},
+        y:{grid:{color:'#1f1f1f'},ticks:{color:'#888',font:{family:'Inter',size:11},callback:v=>formatPrix(v)},beginAtZero:false}
       }
     }
   });
 }
 
-/* =====================================================================
-   FONCTION PRINCIPALE : ESTIMER
-   Valide les entrees, calcule les prix, affiche les resultats
-   ===================================================================== */
-function estimer() {
-  const marque = document.getElementById('sel-marque').value;
-  const modele = document.getElementById('sel-modele').value;
-  const annee  = parseInt(document.getElementById('sel-annee').value);
-  const km     = parseInt(document.getElementById('inp-km').value);
+/* ===== ESTIMER (principal) ===== */
+async function estimer() {
+  const annee = parseInt(document.getElementById('sel-annee').value);
+  const km    = parseInt(document.getElementById('inp-km').value);
 
-  /* --- Validation des champs --- */
-  if (!marque || !modele) {
-    alert('Veuillez selectionner une marque et un modele.');
-    return;
-  }
-  if (!annee) {
-    alert('Veuillez selectionner une annee.');
-    return;
-  }
-  if (isNaN(km) || km < 0) {
-    alert('Veuillez entrer un kilometrage valide (nombre positif).');
-    return;
-  }
+  if (!selectedModele) { alert('Veuillez sélectionner une marque et un modèle.'); return; }
+  if (!annee)          { alert('Veuillez sélectionner une année.'); return; }
+  if (isNaN(km)||km<0) { alert('Veuillez entrer un kilométrage valide.'); return; }
+  if (!F.carburant)    { alert('Veuillez sélectionner un carburant.'); return; }
+  if (!F.boite)        { alert('Veuillez sélectionner la boîte de vitesses.'); return; }
 
-  /* Verification que la combinaison marque/modele existe */
-  if (!VEHICULES[marque] || !VEHICULES[marque][modele]) {
-    alert('Modele introuvable dans la base de donnees. Veuillez verifier votre selection.');
-    return;
-  }
-
-  const modeleData = VEHICULES[marque][modele];
-  const age        = ANNEE_COURANTE - annee;
-
-  /* --- Calcul des fourchettes de prix --- */
-  const prix = calculerPrix(modeleData, annee, km);
-
-  /* --- Determination de l'etat general --- */
+  const m   = selectedModele;
+  const age = ANNEE_COURANTE - annee;
+  const res = calculerPrix(m, annee, km);
   const etat = determinerEtat(age, km);
 
-  /* --- Affichage du badge etat --- */
-  const badgeEl    = document.getElementById('badge-etat');
-  badgeEl.textContent = etat.label;
-  badgeEl.className   = 'badge ' + etat.classe;
+  const badge = document.getElementById('badge-etat');
+  badge.textContent = etat.label; badge.className = 'badge ' + etat.classe;
 
-  /* --- Recapitulatif vehicule --- */
-  document.getElementById('vehicle-summary').innerHTML =
-    '<span><strong>' + marque + ' ' + modele + '</strong></span>' +
-    '<span>Annee <strong>' + annee + '</strong></span>' +
-    '<span>Kilometrage <strong>' + km.toLocaleString('fr-FR') + ' km</strong></span>' +
-    '<span>Age <strong>' + age + ' an' + (age > 1 ? 's' : '') + '</strong></span>' +
-    '<span>Prix neuf <strong>' + formatPrix(modeleData.prixNeuf) + '</strong></span>';
+  const optLabels = {
+    gps:'GPS',cuir:'Cuir',toit:'Toit pano.',camera:'Caméra',chauffants:'Sièges chauf.',
+    parking:'Aide parking',hiver:'Pack hiver',attelage:'Attelage',
+    jantes:'Jantes alu',acc:'ACC',lane:'Lane assist',keyless:'Keyless'
+  };
 
-  /* --- Animation des compteurs de prix --- */
-  animerCompteur(document.getElementById('prix-haut'),  prix.haut,  900);
-  animerCompteur(document.getElementById('prix-moyen'), prix.moyen, 1000);
-  animerCompteur(document.getElementById('prix-bas'),   prix.bas,   1100);
+  let summaryHtml =
+    `<span><strong>${m.marqueNom} ${m.nom}</strong></span>` +
+    `<span>Carburant <strong>${F.carburant}</strong></span>` +
+    `<span>Boîte <strong>${F.boite}</strong></span>` +
+    `<span>Année <strong>${annee}</strong></span>` +
+    `<span>Kilométrage <strong>${km.toLocaleString('fr-FR')} km</strong></span>` +
+    `<span>Âge <strong>${age} an${age>1?'s':''}</strong></span>`;
+  if (F.couleur) summaryHtml += `<span>Couleur <strong>${F.couleur}</strong></span>`;
+  if (F.options.size > 0) summaryHtml += `<span>Options <strong>${[...F.options].map(o=>optLabels[o]||o).join(', ')}</strong></span>`;
+  document.getElementById('vehicle-summary').innerHTML = summaryHtml;
 
-  /* --- Tracage du graphique de depreciation --- */
-  tracerGraphique(modeleData, marque, modele, annee);
+  animerCompteur(document.getElementById('prix-haut'),  res.haut,  900);
+  animerCompteur(document.getElementById('prix-moyen'), res.moyen, 1000);
+  animerCompteur(document.getElementById('prix-bas'),   res.bas,   1100);
 
-  /* --- Revelation de la section resultats avec scroll --- */
+  afficherBreakdown(res, m, annee, km);
+  tracerGraphique(m, annee);
+
   const section = document.getElementById('results');
   section.style.display = 'block';
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  section.scrollIntoView({behavior:'smooth',block:'start'});
+
+  if (modeAPI && m.id) {
+    try {
+      await fetch('/api/estimations', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          id_modele: m.id, annee_vehicule: annee, kilometrage: km,
+          prix_bas: res.bas, prix_moyen: res.moyen, prix_haut: res.haut,
+          etat_estime: etat.label
+        })
+      });
+    } catch(_) {}
+  }
 }
+
+init();
 </script>
 </body>
 </html>
