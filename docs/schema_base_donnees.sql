@@ -84,7 +84,12 @@ WHERE mo.id IS NULL;
 
 -- =====================================================
 -- ÉVOLUTIONS PRÉVUES (non implémentées dans la v2)
--- Documentées ici à titre de conception étendue
+--
+-- L'application en production utilise les 3 tables ci-dessus.
+-- Ces trois tables sont laissées en commentaire pour montrer
+-- comment l'architecture pourrait grandir. Elles ne sont pas
+-- implémentées : j'ai préféré livrer un périmètre maîtrisé
+-- et fonctionnel plutôt qu'une base partiellement utilisée.
 -- =====================================================
 
 -- -- TABLE : utilisateurs (système d'authentification)
