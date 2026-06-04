@@ -36,7 +36,7 @@ Les particuliers souhaitant vendre leur véhicule d'occasion ne disposent pas to
 
 - Architecture 3-tiers : Frontend (HTML/JS) → API REST (Vercel Serverless) → Base de données PostgreSQL (Neon)
 - Déploiement sur Vercel avec URL publique stable
-- Base de données relationnelle PostgreSQL avec 6 tables
+- Base de données relationnelle PostgreSQL avec 3 tables
 - API RESTful documentée (3 endpoints)
 
 ---
@@ -104,8 +104,7 @@ Les particuliers souhaitant vendre leur véhicule d'occasion ne disposent pas to
    /api/estimations — GET / POST
         ↓ SQL
 [ Base de données PostgreSQL — Neon Cloud ]
-   6 tables : marques, modeles, utilisateurs,
-              estimations, favoris, historique_prix_marche
+   3 tables : marques, modeles, estimations
 ```
 
 ---
@@ -134,7 +133,7 @@ Les particuliers souhaitant vendre leur véhicule d'occasion ne disposent pas to
 | `api/marques.js` | Endpoint GET /api/marques | ✅ |
 | `api/modeles.js` | Endpoint GET /api/modeles | ✅ |
 | `api/estimations.js` | Endpoint GET/POST /api/estimations | ✅ |
-| `database.sql` | Script SQL complet (6 tables + données) | ✅ |
+| `database.sql` | Script SQL complet (3 tables + données) | ✅ |
 | `docs/conception.md` | Diagrammes UML + MCD/MLD | ✅ |
 | `docs/architecture.md` | Architecture technique | ✅ |
 | `docs/guide_utilisateur.md` | Guide d'utilisation complet | ✅ |

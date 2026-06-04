@@ -119,7 +119,7 @@ td.warn-status{color:var(--orange);}
   <!-- CHIFFRES CLÉS -->
   <div class="summary-grid">
     <div class="summary-card"><div class="sc-icon">🚗</div><div class="sc-val">200+</div><div class="sc-label">Modèles de véhicules</div></div>
-    <div class="summary-card"><div class="sc-icon">🗄️</div><div class="sc-val">6</div><div class="sc-label">Tables PostgreSQL</div></div>
+    <div class="summary-card"><div class="sc-icon">🗄️</div><div class="sc-val">3</div><div class="sc-label">Tables PostgreSQL</div></div>
     <div class="summary-card"><div class="sc-icon">⚡</div><div class="sc-val">3</div><div class="sc-label">Endpoints API REST</div></div>
     <div class="summary-card"><div class="sc-icon">✅</div><div class="sc-val">49</div><div class="sc-label">Cas de tests (100% OK)</div></div>
     <div class="summary-card"><div class="sc-icon">📄</div><div class="sc-val">9</div><div class="sc-label">Documents de projet</div></div>
@@ -194,7 +194,7 @@ td.warn-status{color:var(--orange);}
     </tr>
     <tr>
       <td class="crit-name">Diagramme de classes (UML)</td>
-      <td class="crit-proof">6 classes : Marque, Modele, Estimation, Utilisateur, Favori, HistoriquePrixMarche — avec attributs typés, méthodes et multiplicités.</td>
+      <td class="crit-proof">3 classes : Marque, Modele, Estimation — avec attributs typés, méthodes et multiplicités. (Marque 1—N Modele 1—N Estimation)</td>
       <td class="crit-file">conception.md §3</td>
       <td class="crit-status ok-status">✅</td>
     </tr>
@@ -212,7 +212,7 @@ td.warn-status{color:var(--orange);}
     </tr>
     <tr>
       <td class="crit-name">MLD — Modèle Logique de Données</td>
-      <td class="crit-proof">6 tables avec clés primaires, clés étrangères annotées (#), attribut nullable documenté (id_utilisateur dans estimations).</td>
+      <td class="crit-proof">3 tables avec clés primaires et clés étrangères annotées (#) : MARQUES → MODELES (#id_marque) → ESTIMATIONS (#id_modele).</td>
       <td class="crit-file">conception.md §5</td>
       <td class="crit-status ok-status">✅</td>
     </tr>
@@ -258,7 +258,7 @@ td.warn-status{color:var(--orange);}
     </tr>
     <tr>
       <td class="crit-name">Base de données relationnelle</td>
-      <td class="crit-proof">PostgreSQL 16 avec 6 tables normalisées (3NF), 10 marques, 36 modèles, données de référence. Hébergé sur Neon Cloud.</td>
+      <td class="crit-proof">PostgreSQL 16 avec 3 tables normalisées (3NF) : marques (10), modeles (36), estimations. Fallback embarqué : 28 marques, 210 modèles si API indisponible. Hébergé sur Neon Cloud.</td>
       <td class="crit-file">database.sql<br>scripts/init-db.js</td>
       <td class="crit-status ok-status">✅</td>
     </tr>
@@ -322,7 +322,7 @@ td.warn-status{color:var(--orange);}
     </tr>
     <tr>
       <td class="crit-name">Tests de la base de données</td>
-      <td class="crit-proof">5 cas : intégrité référentielle (CASCADE), contrainte CHECK état, UNIQUE favoris, estimation anonyme (NULL).</td>
+      <td class="crit-proof">5 cas : intégrité référentielle (CASCADE), contrainte CHECK état (Excellent/Bon/Correct/Fatigué), clé étrangère id_modele, sauvegarde estimation, requête JOIN marques-modeles-estimations.</td>
       <td class="crit-file">plan_tests.md §5</td>
       <td class="crit-status ok-status">✅</td>
     </tr>

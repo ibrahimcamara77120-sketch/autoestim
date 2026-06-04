@@ -181,7 +181,7 @@ td.ko{color:#e74c3c; font-weight:600;}
     <ul style="margin-left:20px; margin-top:8px;">
       <li style="margin-bottom:6px;">Architecture <strong>3-tiers</strong> : Frontend (HTML/JS) → API REST (Vercel Serverless) → BDD PostgreSQL (Neon)</li>
       <li style="margin-bottom:6px;">Déploiement sur Vercel avec URL publique HTTPS stable</li>
-      <li style="margin-bottom:6px;">Base de données relationnelle PostgreSQL avec 6 tables normalisées</li>
+      <li style="margin-bottom:6px;">Base de données relationnelle PostgreSQL avec 3 tables normalisées</li>
       <li style="margin-bottom:6px;">3 endpoints REST documentés avec gestion des erreurs</li>
       <li style="margin-bottom:6px;">Mode dégradé (fallback local) si l'API est indisponible</li>
     </ul>
@@ -255,8 +255,7 @@ td.ko{color:#e74c3c; font-weight:600;}
 ┌──────────────────────────────────────────────────────────────┐
 │              COUCHE DONNÉES                                  │
 │   PostgreSQL 16 — Neon Cloud (AWS us-east-1)                 │
-│   6 tables : marques, modeles, utilisateurs,                 │
-│              estimations, favoris, historique_prix_marche    │
+│   3 tables : marques, modeles, estimations                   │
 └──────────────────────────────────────────────────────────────┘</div>
 
     <h3>Endpoints API</h3>
@@ -297,7 +296,7 @@ td.ko{color:#e74c3c; font-weight:600;}
       <div class="tl-row"><div class="tl-phase">Conception</div><div class="tl-task">MCD/MLD, diagrammes UML (cas d'utilisation, séquence, classes), architecture</div><div class="tl-dur">3h</div></div>
       <div class="tl-row"><div class="tl-phase">Frontend</div><div class="tl-task">HTML/CSS dark mode, algorithme dépréciation JS, Chart.js, filtres avancés</div><div class="tl-dur">8h</div></div>
       <div class="tl-row"><div class="tl-phase">Backend</div><div class="tl-task">3 Serverless Functions Node.js, connexion Neon, gestion erreurs</div><div class="tl-dur">4h</div></div>
-      <div class="tl-row"><div class="tl-phase">Base de données</div><div class="tl-task">Schéma 6 tables, peuplement 28 marques / 200+ modèles, script init-db.js</div><div class="tl-dur">3h</div></div>
+      <div class="tl-row"><div class="tl-phase">Base de données</div><div class="tl-task">Schéma 3 tables, peuplement 28 marques / 200+ modèles (fallback), script init-db.js</div><div class="tl-dur">3h</div></div>
       <div class="tl-row"><div class="tl-phase">Tests</div><div class="tl-task">49 cas de tests (interface, API, BDD, responsive, compatibilité)</div><div class="tl-dur">2h</div></div>
       <div class="tl-row"><div class="tl-phase">Documentation</div><div class="tl-task">CDC, architecture, UML, MCD/MLD, guide utilisateur, veille, bilan, synthèse E6</div><div class="tl-dur">3h</div></div>
       <div class="tl-row"><div class="tl-phase">Déploiement</div><div class="tl-task">Vercel CLI, Neon Marketplace, variables d'environnement, CI/CD</div><div class="tl-dur">1h</div></div>
@@ -315,7 +314,7 @@ td.ko{color:#e74c3c; font-weight:600;}
       <tr><td><code>api/marques.js</code></td><td>Endpoint GET /api/marques (Node.js Serverless)</td><td class="ok">✅</td></tr>
       <tr><td><code>api/modeles.js</code></td><td>Endpoint GET /api/modeles (Node.js Serverless)</td><td class="ok">✅</td></tr>
       <tr><td><code>api/estimations.js</code></td><td>Endpoint GET+POST /api/estimations</td><td class="ok">✅</td></tr>
-      <tr><td><code>database.sql</code></td><td>Script SQL complet (6 tables + données)</td><td class="ok">✅</td></tr>
+      <tr><td><code>database.sql</code></td><td>Script SQL complet (3 tables + données)</td><td class="ok">✅</td></tr>
       <tr><td><code>scripts/init-db.js</code></td><td>Script d'initialisation base Neon (Node.js)</td><td class="ok">✅</td></tr>
       <tr><td><code>docs/conception.md</code></td><td>Diagrammes UML + MCD/MLD/MPD + algorithme</td><td class="ok">✅</td></tr>
       <tr><td><code>docs/architecture.md</code></td><td>Architecture technique complète + API doc</td><td class="ok">✅</td></tr>

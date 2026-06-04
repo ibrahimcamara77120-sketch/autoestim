@@ -204,7 +204,6 @@ CREATE TABLE modeles (
 CREATE TABLE estimations (
     id             SERIAL PRIMARY KEY,
     id_modele      INTEGER NOT NULL REFERENCES modeles(id),
-    id_utilisateur INTEGER REFERENCES utilisateurs(id),  -- nullable
     annee_vehicule INTEGER     NOT NULL,
     kilometrage    INTEGER     NOT NULL,
     prix_bas       INTEGER     NOT NULL,

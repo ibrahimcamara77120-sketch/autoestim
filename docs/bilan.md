@@ -20,7 +20,7 @@ AutoEstim est un estimateur de prix de revente automobile développé dans le ca
 |-----------------|----------|
 | Application web fonctionnelle accessible en ligne | ✅ Déployée sur Vercel |
 | Architecture full-stack (Frontend + API + BDD) | ✅ 3 couches distinctes |
-| Base de données relationnelle PostgreSQL | ✅ 6 tables, Neon cloud |
+| Base de données relationnelle PostgreSQL | ✅ 3 tables, Neon cloud |
 | Couvrir les principales marques/modèles | ✅ 28 marques, 200+ modèles |
 | Algorithme de dépréciation réaliste | ✅ Validation sur cas réels |
 | Filtres avancés inspirés du marché professionnel | ✅ Carburant, boîte, couleur, options, historique |
@@ -41,7 +41,7 @@ AutoEstim est un estimateur de prix de revente automobile développé dans le ca
 - Implémenter un mode dégradé (fallback) pour la résilience
 
 **Base de données :**
-- Modéliser une base relationnelle avec 6 tables (Merise : MCD → MLD → MPD)
+- Modéliser une base relationnelle (Merise : MCD → MLD → MPD) et l'implémenter en PostgreSQL
 - Écrire des requêtes SQL complexes avec JOIN, GROUP BY
 - Gérer les contraintes d'intégrité (FK, UNIQUE, CHECK)
 - Déployer et peupler une base PostgreSQL cloud
